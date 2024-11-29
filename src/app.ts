@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import connectdb from './config/dbconfig';
 import dotenv from 'dotenv'
 import adminRoute from './routes/admin/adminRoute'
-
+import userRoute from './routes/user/userRoute'
 
 
 
@@ -29,6 +29,7 @@ app.use(urlencoded({extended:true}))
 connectdb();
 
 app.use('/admin/',adminRoute)
+app.use('/',userRoute)
 
 app.get('/',(req,res)=>{
     res.send("welcome to speak swap")
