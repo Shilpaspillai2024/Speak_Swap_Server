@@ -1,15 +1,14 @@
-import { Schema,model,Document } from "mongoose";
+import { Schema,model,Document, ObjectId } from "mongoose";
 
 interface IUser extends Document{
+    _id:ObjectId;
     fullName:string;
     email:string;
     password:string;
     phone:string;
     isActive:boolean;
-    continent:string;
     country:string;
-    language:string;
-    proficiency:string;
+    nativeLanguage:string;
     knownLanguages:String;
     learnLanguage:string;
     learnProficiency:string;
@@ -19,6 +18,7 @@ interface IUser extends Document{
     profilePhoto:string;
     otp?:string;
     otpExpiration?:Date;
+    isVerified:boolean;
     
 
 }
@@ -42,25 +42,17 @@ const userSchema =new Schema<IUser>({
     },
     isActive:{
         type:Boolean,
-       
         default:false
-    },
-    continent:{
-        type:String,
-       
     },
     country:{
         type:String,
        
     },
-    language:{
+    nativeLanguage:{
         type:String,
         
     },
-    proficiency:{
-        type:String,
-       
-    },
+  
 
     knownLanguages:{
         type:[String],
@@ -97,6 +89,12 @@ const userSchema =new Schema<IUser>({
     otpExpiration:{
         type:Date,
     },
+    
+    isVerified:{
+        type:Boolean,
+        default:false
+    }
+    
 
 })
 

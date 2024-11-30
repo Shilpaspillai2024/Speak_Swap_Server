@@ -1,6 +1,11 @@
 import { IUser } from "../../models/user/userModel";
 import UserRepository from "../../repositories/user/userRepository";
 import EmailUtils from "../../utils/emailUtils";
+import PasswordUtils from "../../utils/passwordUtils";
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 class UserService {
   private userRepository: UserRepository;
@@ -10,8 +15,29 @@ class UserService {
   }
 
 
+
+  // Generate jwt
+
+  private generateToken(userId:string):string{
+    const token =jwt.sign({userId},process.env.JWT_TOKEN_SECRET!,{
+      expiresIn:"1h",
+    });
+
+    return token;
+  }
+
+
+  public verifyToken(token:string):string{
+    try {
+      const decoded =jwt.verify(token,process.env.JWT_TOKEN_SECRET!) as {userId:string}
+       return decoded.userId;
+    } catch (error) {
+      throw new Error("Invalid or expired token")
+    }
+  }
+
   //signup step1
-  async registerBasicDetails(userDetails: Partial<IUser>): Promise<IUser> {
+  async registerBasicDetails(userDetails: Partial<IUser>): Promise<{user:IUser,token:string}> {
     const existingUser = await this.userRepository.findUserByEmail(
       userDetails.email!
     );
@@ -20,7 +46,9 @@ class UserService {
     }
 
     const user = await this.userRepository.createUser(userDetails);
-    return user;
+    const token=this.generateToken(user._id.toString())
+    
+    return {user,token}
   }
 
   //send otp
@@ -71,7 +99,7 @@ async verifyOtp(email:string,otp:string):Promise<string>{
     throw new Error("otp has expired")
   }
 
-
+  user.isVerified =true;
   user.otp =undefined;
   user.otpExpiration=undefined;
   await user.save()
@@ -79,6 +107,34 @@ async verifyOtp(email:string,otp:string):Promise<string>{
   return "Otp verified successfully"
 }
 
+
+async setPassword(email:string,password:string):Promise<IUser>{
+    const user=await this.userRepository.findUserByEmail(email);
+    if(!user || !user.isVerified){
+      throw new Error("User not found or not verified");
+    }
+
+   const hashedPassword=await PasswordUtils.hashPassword(password)
+    user.password =hashedPassword;
+    await user.save()
+    return user;
+
+
+}
+
+
+// for step4 fetching countries continents languges from external api
+
+  async updateProfileDetails(email:string,details:Partial<IUser>):Promise<IUser>{
+    const user= await this.userRepository.findUserByEmail(email)
+    if(!user){
+      throw new Error("User Not found")
+    }
+
+    Object.assign(user,details);
+    await user.save()
+    return user;
+  }
 
 
 
