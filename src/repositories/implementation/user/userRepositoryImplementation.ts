@@ -16,7 +16,7 @@ class UserRepositoryImplementation implements UserRepository{
     }
 
     async findUserById(id: string): Promise<IUser | null> {
-        return await User.findOne({id})
+        return await User.findById(id)
     }
 
 

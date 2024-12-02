@@ -23,8 +23,12 @@ class UserController {
 
   async sendOtp(req: Request, res: Response): Promise<void> {
     try {
-      const { email } = req.body;
-      const response = await this.userService.sendOtp(email);
+      const { token } = req.body;
+      if(!token){
+        res.status(400).json({error:"Token is requied"});
+        return;
+      }
+      const response = await this.userService.sendOtp(token);
       res.status(200).json(response);
     } catch (error) {
       let errorMessage = "an unexpected error occured";
@@ -75,7 +79,7 @@ class UserController {
       }
 
       const userId=this.userService.verifyToken(token)
-      
+
       const result=await this.userService.setPassword(userId,password);
       res.status(200).json({message:"Password Set Successfully",result})
       
@@ -122,6 +126,66 @@ class UserController {
       }
       res.status(400).json({ error: errorMessage });
     
+      
+    }
+  }
+
+
+
+  async updateInterest(req:Request,res:Response):Promise<void>{
+    try {
+
+      const {token,talkAbout,learningGoal,whyChat}=req.body;
+
+      if(!token ||!talkAbout || !learningGoal ||!whyChat){
+        res.status(400).json({error:"All fields are required"})
+        return;
+      }
+
+      const userId=this.userService.verifyToken(token)
+      const updatedUser=await this.userService.updateInterest(userId,{
+        talkAbout,
+        learningGoal,
+        whyChat
+      })
+
+      res.status(200).json({ message: "user interest added successfully", updatedUser });
+      
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    res.status(400).json({ error: errorMessage });
+      
+    }
+  }
+
+
+  async uploadProfilePicture(req:Request,res:Response):Promise<void>{
+    try {
+
+      const {token}=req.body;
+      if(!token || !req.file){
+        res.status(400).json({error:"Token and file are required"})
+        return;
+      }
+
+      const userId=this.userService.verifyToken(token);
+      const filePath=req.file.path;
+      const updateUser=await this.userService.uploadProfilePicture(userId,filePath)
+      res.status(200).json({
+        message:"profile picture uploaded successfully",
+        profilePhoto:updateUser.profilePhoto,
+      })
+      
+    } catch (error) {
+
+      let errorMessage = "An unexpected error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      res.status(400).json({ error: errorMessage });
       
     }
   }
