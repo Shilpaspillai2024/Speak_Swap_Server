@@ -21,7 +21,7 @@ router.post("/signup/verify_otp",(req,res)=>userController.verifyOtp(req,res))
 router.post("/signup/setpassword",(req,res)=>userController.setpassword(req,res))
 router.post("/signup/updateprofile",(req,res)=>userController.updateProfileDetails(req,res))
 router.post("/signup/interest",(req,res)=>userController.updateInterest(req,res))
-router.post("/signup/upload_pofile_picture",upload.single("profilePicture"),(req,res)=>userController.uploadProfilePicture(req,res))
+router.post("/signup/upload_profile_picture",upload.single("profilePhoto"),(req,res)=>userController.uploadProfilePicture(req,res))
 
 router.get("/countries",(req,res)=>geoController.getCountries(req,res))
 router.get("/languages",(req,res)=>geoController.getLanguages(req,res))

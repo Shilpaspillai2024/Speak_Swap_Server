@@ -80,6 +80,12 @@ class UserController {
 
       const userId=this.userService.verifyToken(token)
 
+      if (!userId) {
+        console.error("Invalid or expired token");
+        res.status(400).json({ error: "Invalid or expired token" });
+        return;
+      }
+
       const result=await this.userService.setPassword(userId,password);
       res.status(200).json({message:"Password Set Successfully",result})
       
@@ -172,7 +178,15 @@ class UserController {
       }
 
       const userId=this.userService.verifyToken(token);
-      const filePath=req.file.path;
+      if (!userId) {
+        res.status(400).json({ error: "Invalid token" })
+        return
+      }
+      const filePath=req.file?.path;
+      if (!filePath) {
+        res.status(400).json({ error: "File path is missing" })
+        return
+      }
       const updateUser=await this.userService.uploadProfilePicture(userId,filePath)
       res.status(200).json({
         message:"profile picture uploaded successfully",
