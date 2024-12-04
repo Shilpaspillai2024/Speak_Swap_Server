@@ -28,7 +28,7 @@ app.use(urlencoded({extended:true}))
 
 connectdb();
 
-app.use('/admin/',adminRoute)
+app.use('/admin',adminRoute)
 app.use('/',userRoute)
 
 app.get('/',(req,res)=>{

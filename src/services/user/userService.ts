@@ -186,6 +186,36 @@ async setPassword(userId:string,password:string):Promise<IUser>{
     
   }
 
+
+  // user login
+
+  async findUserByEmail(email:string):Promise<IUser | null>{
+   const user= await this.userRepository.findUserByEmail(email)
+   return user
+  }
+
+  async authenticateUser(email:string,password:string):Promise<{user:IUser |null,message:string}>{
+
+
+    const user=await this.userRepository.findUserByEmail(email);
+    if(!user){
+      return {user:null,message:'No user is registered with this email'}
+    }
+
+
+
+    if(!user.isActive){
+      return {user:null,message:" You account is inactive"}
+    }
+
+    const comparePassword=await PasswordUtils.comparePassword(password,user.password);
+    if(!comparePassword){
+      return{user:null,message:"Invalid Password"}
+    }
+
+    return{user:user,message:" User is Authenticated"}
+  }
+
 }
 
 export default UserService;
