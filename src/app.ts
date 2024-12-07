@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import { json,urlencoded } from 'express';
-import mongoose from 'mongoose';
 import connectdb from './config/dbconfig';
 import dotenv from 'dotenv'
 import adminRoute from './routes/admin/adminRoute'
 import userRoute from './routes/user/userRoute'
+import tutorRoute from './routes/tutor/tutorRoute'
 
 
 
@@ -30,6 +30,7 @@ connectdb();
 
 app.use('/admin',adminRoute)
 app.use('/',userRoute)
+app.use('/tutor',tutorRoute)
 
 app.get('/',(req,res)=>{
     res.send("welcome to speak swap")
