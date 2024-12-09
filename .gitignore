@@ -33,3 +33,5 @@ Thumbs.db
 # Miscellaneous
 *.temp
 *.tmp
+
+/uploads

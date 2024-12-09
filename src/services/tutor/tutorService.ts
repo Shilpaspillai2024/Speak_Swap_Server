@@ -122,35 +122,40 @@ class TutorService {
   }
 
 
-
+  //step 4 of  tutor signup
   async setTutorprofile(
     tutorId: string,
     details: Partial<ITutor>,
     files: {
-      profilePhoto?: string;  // Change from `File` to `string`
-      introductionVideo?: string;  // Change from `File` to `string`
-      certificates?: string[];  // Array of strings for file paths
+      profilePhoto?: string;
+      introductionVideo?: string;
+      certificates?: string[];
     }
   ): Promise<ITutor> {
     const tutor = await this.tutorRepository.findTutorById(tutorId);
     if (!tutor) {
       throw new Error("User Not found");
     }
-  
+
     // Handle Profile Photo Upload
     if (files.profilePhoto) {
-      const profilePhotoPath = files.profilePhoto; // It's now a string (file path)
-      const profilePhotoResult = await cloudinary.uploader.upload(profilePhotoPath, {
-        folder: "tutor/profile_photos",
-        use_filename: true,
-        unique_filename: true,
-      });
-      details.profilePhoto = profilePhotoResult.secure_url; // Save the Cloudinary URL
+      const profilePhotoPath = files.profilePhoto;
+
+      const profilePhotoResult = await cloudinary.uploader.upload(
+        profilePhotoPath,
+        {
+          folder: "tutor/profile_photos",
+          use_filename: true,
+          unique_filename: true,
+        }
+      );
+
+      details.profilePhoto = profilePhotoResult.secure_url;
     }
-  
+
     // Handle Introduction Video Upload
     if (files.introductionVideo) {
-      const videoPath = files.introductionVideo; // It's now a string (file path)
+      const videoPath = files.introductionVideo;
       const videoResult = await cloudinary.uploader.upload(videoPath, {
         folder: "tutor/introduction_videos",
         resource_type: "video",
@@ -159,28 +164,117 @@ class TutorService {
       });
       details.introductionVideo = videoResult.secure_url;
     }
-  
+
     // Handle Certificates Upload
     if (files.certificates && files.certificates.length > 0) {
       const certificateUrls = [];
       for (const certificate of files.certificates) {
-        const certPath = certificate; // It's now a string (file path)
+        const certPath = certificate;
         const certResult = await cloudinary.uploader.upload(certPath, {
           folder: "tutor/certificates",
           use_filename: true,
           unique_filename: true,
         });
-        certificateUrls.push(certResult.secure_url); // Save the Cloudinary URL
+        certificateUrls.push(certResult.secure_url);
       }
       details.certificates = certificateUrls;
     }
-  
-    // Update tutor details
+
+    
     Object.assign(tutor, details);
     await tutor.save();
     return tutor;
   }
-  
+
+// tutor login
+
+async authenticateTutor(email:string,password:string):Promise<{tutor:ITutor |null,message:string}>{
+
+
+  const tutor=await this.tutorRepository.findTutorByEmail(email);
+  if(!tutor){
+    return {tutor:null,message:'No tutor is registered with this email'}
+  }
+
+
+  const comparePassword=await PasswordUtils.comparePassword(password,tutor.password);
+  if(!comparePassword){
+    return{tutor:null,message:"Invalid Password"}
+  }
+
+  return{tutor:tutor,message:" tutor is Authenticated"}
+}
+
+
+//tutor forgot password
+
+async sendForgotPasswordOtp(email: string): Promise<{ message: string }> {
+  const tutor = await this.tutorRepository.findTutorByEmail(email);
+
+  if (!tutor) {
+    throw new Error("tutor not found");
+  }
+
+  //generate 4 digit otp
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  const otpExpiration = new Date();
+
+  otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+
+  tutor.otp = otp;
+  tutor.otpExpiration = otpExpiration;
+  await tutor.save();
+
+  const response = await EmailUtils.sendOtp(tutor.email, otp);
+  return { message: "OTP sent successfully to email" };
+}
+
+//forgotpassword verify
+
+async verifyForgotPassword(email: string, otp: string): Promise<string> {
+  const tutor = await this.tutorRepository.findTutorByEmail(email);
+
+  if (!tutor) {
+    throw new Error("tutor not found");
+  }
+
+  if (tutor.otp !== otp) {
+    throw new Error("Invalid otp");
+  }
+
+  if (new Date() > tutor.otpExpiration!) {
+    throw new Error("otp has expired");
+  }
+
+  tutor.isVerified = true;
+  tutor.otp = undefined;
+  tutor.otpExpiration = undefined;
+  await tutor.save();
+
+  return "OTP verified successfully";
+}
+
+// forgot password reset
+
+async resetPassword(email: string, newPassword: string): Promise<ITutor> {
+  const tutor = await this.tutorRepository.findTutorByEmail(email);
+
+  if (!tutor) {
+    throw new Error("tutor not found");
+  }
+
+  const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+  tutor.password = hashedPassword;
+  await tutor.save();
+  return tutor;
+}
+
+
+
+
+
+
+
 }
 
 export default TutorService;

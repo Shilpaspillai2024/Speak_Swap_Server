@@ -231,8 +231,73 @@ class UserController {
       res.status(200).json({
         message: "Login Successfull",
         accessToken,
-        user
+        user,
       });
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      res.status(400).json({ error: errorMessage });
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        res.status(400).json({ error: "Email is required" });
+        return;
+      }
+
+      const response = await this.userService.sendForgotPasswordOtp(email);
+      res.status(200).json(response);
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      res.status(400).json({ error: errorMessage });
+    }
+  }
+
+  // Step 2: Verify OTP for password reset
+  async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, otp } = req.body;
+      if (!email || !otp) {
+        res.status(400).json({ error: "Email and OTP are required" });
+        return;
+      }
+
+      const message = await this.userService.verifyForgotPassword(email, otp);
+      res.status(200).json({ message });
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      res.status(400).json({ error: errorMessage });
+    }
+  }
+
+  // Step 3: Reset password after OTP verification
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, newPassword, confirmPassword } = req.body;
+
+      if (!email) {
+        res.status(400).json({ error: "Email is required" });
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        res.status(400).json({ error: "Passwords do not match" });
+        return;
+      }
+
+      const user = await this.userService.resetPassword(email, newPassword);
+      res.status(200).json({ message: "Password reset successfully", user });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
