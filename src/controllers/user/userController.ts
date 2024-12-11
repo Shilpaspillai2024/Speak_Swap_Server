@@ -1,6 +1,7 @@
 import UserService from "../../services/user/userService";
 import { Request, Response } from "express";
 import JwtUtils from "../../utils/jwtUtils";
+import { CustomRequest } from "../../middlewares/authenticationMiddleware";
 
 class UserController {
   private userService: UserService;
@@ -217,7 +218,7 @@ class UserController {
         }
       }
 
-      const payload = { userId: user?._id };
+      const payload = { userId: user!._id };
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 
@@ -225,7 +226,7 @@ class UserController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "none",
-        maxAge: 1 * 60 * 60 * 1000, // 1hr
+        maxAge: 1 * 60 * 60 * 1000, 
       });
 
       res.status(200).json({
@@ -304,6 +305,27 @@ class UserController {
         errorMessage = error.message;
       }
       res.status(400).json({ error: errorMessage });
+    }
+  }
+
+
+
+  async getAllUsers(req:CustomRequest,res:Response):Promise<void>{
+    try {
+
+      const loggedInUser=req.user;
+     
+      if(!loggedInUser){
+        res.status(401).json({message:"authentication failed"})
+        return;
+      }
+      const allusers=await this.userService.getAllUsers();
+      const users=allusers.filter(user=>user.id !==loggedInUser && user.isActive)
+      res.status(200).json(users)
+      
+    } catch (error) {
+      res.status(500).json({message:"fetch user details error"})
+      
     }
   }
 }

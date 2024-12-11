@@ -68,6 +68,12 @@ const tutorSchema=new Schema<ITutor>({
     },
     introductionVideo:{
         type:String
+    },
+    status:{
+        type:String,
+        enum:["pending","approved","rejected"],
+        default:"pending"
+
     }
     
 

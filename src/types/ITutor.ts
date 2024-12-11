@@ -7,7 +7,7 @@ export interface ITutor extends Document{
     email:string,
     phone:string,
     password:string,
-    gender?: string; // Optional since not marked as required in schema
+    gender?: string; 
     dob?: Date;
     otp?:string;
     otpExpiration?:Date;
@@ -21,6 +21,7 @@ export interface ITutor extends Document{
     introductionVideo:string;
     createdAt:Date;
     updatedAt:Date;
+    status:"pending" | "approved" | "rejected"
 
     
 }

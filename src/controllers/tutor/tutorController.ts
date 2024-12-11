@@ -166,6 +166,7 @@ class TutorController {
         email,
         password
       );
+     
 
       if (!tutor) {
         if (message === "No tutor is registered with this email") {
@@ -174,12 +175,12 @@ class TutorController {
         }
 
         if (message === "Invalid password") {
-          res.status(401).json(message);
+          res.status(401).json({ message});
           return;
         }
       }
 
-      const payload = { tutorId: tutor?._id };
+      const payload = { tutorId: tutor!._id };
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 

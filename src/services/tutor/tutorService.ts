@@ -182,6 +182,7 @@ class TutorService {
 
     
     Object.assign(tutor, details);
+    tutor.status="pending"
     await tutor.save();
     return tutor;
   }

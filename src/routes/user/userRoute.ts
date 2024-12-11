@@ -5,6 +5,7 @@ import UserRepositoryImplementation from "../../repositories/implementation/user
 import GeoController from "../../controllers/user/geoController";
 import GeoService from "../../services/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
+import authenticationMiddleware from "../../middlewares/authenticationMiddleware";
 
 const router=Router()
 
@@ -31,4 +32,6 @@ router.post("/reset-password",(req,res)=>userController.resetPassword(req,res))
 router.get("/countries",(req,res)=>geoController.getCountries(req,res))
 router.get("/languages",(req,res)=>geoController.getLanguages(req,res))
 
+
+router.get("/users",authenticationMiddleware,(req,res)=>userController.getAllUsers(req,res))
 export default router;

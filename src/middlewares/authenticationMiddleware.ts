@@ -7,47 +7,32 @@ export interface CustomRequest extends Request {
 }
 
 interface DecodedToken {
-  email: string;
+  userId: string;
 }
 
-const authenticationMiddleware = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const token = req.header("Authorization")?.replace("Bearer", "");
-    if (!token) {
-      return res
-        .status(401)
-        .send({ error: "Authentication failed Token mising" });
-    }
 
+const authenticationMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      throw new Error('Authentication failed. Token missing.');
+    }
     const accessSecret = process.env.JWT_ACCESS_TOKEN_SECRET_KEY as string;
     if (!accessSecret) {
-      return res
-        .status(500)
-        .send({ error: "JWT secret key is not set in environment variables" });
+      throw new Error('JWT secret key is not set in environment variables.');
     }
-
     const decoded = jwt.verify(token, accessSecret) as DecodedToken;
-    req.user = decoded.email;
+    req.user = decoded.userId;
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return res
-        .status(401)
-        .send({ error: "Token expired. Please refersh your token" });
-    } else if (error instanceof jwt.JsonWebTokenError) {
-      return res
-        .status(401)
-        .send({ error: "Invalid token. Authentication failed." });
+      res.status(401).send({ error: 'Token expired. Please refresh your token.' });
     } else if (error instanceof Error) {
-      return res.status(500).send({ error: "An unexpected error occurred." });
+      res.status(401).send({ error: 'Authentication failed.' });
     } else {
-      return res.status(500).send({ error: "An unknown error occurred." });
+      res.status(500).send({ error: 'An unexpected error occurred.' });
     }
   }
-};
+}
 
 export default authenticationMiddleware;

@@ -5,6 +5,8 @@ interface UserRepository{
     findUserByEmail(email:string):Promise<IUser | null>
     findUserById(id:string):Promise<IUser | null>
     updateUser(id:string,update:Partial<IUser>):Promise<IUser | null>
+    getAllUsers():Promise<IUser[]>
+    deleteUser(id:string):Promise<IUser | null>
 }
 
 export default UserRepository

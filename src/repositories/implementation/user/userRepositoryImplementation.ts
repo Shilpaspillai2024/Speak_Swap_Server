@@ -24,6 +24,14 @@ class UserRepositoryImplementation implements UserRepository{
         return await User.findByIdAndUpdate(id,update,{new:true})
     }
 
+    async getAllUsers(): Promise<IUser[]> {
+        return await User.find()
+    }
+
+    async deleteUser(id: string): Promise<IUser | null> {
+        return await User.findByIdAndDelete(id)
+    }
+
 }
 
 

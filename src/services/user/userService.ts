@@ -265,6 +265,16 @@ class UserService {
     await user.save();
     return user;
   }
+
+
+
+  async getAllUsers():Promise<IUser[]>{
+    return await this.userRepository.getAllUsers();
+  }
+
+  async deleteuser(id:string):Promise<IUser | null>{
+    return await this.userRepository.deleteUser(id)
+  }
 }
 
 export default UserService;
