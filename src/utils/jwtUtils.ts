@@ -9,21 +9,30 @@ const refreshSecret=process.env.JWT_REFRESH_TOKEN_SECRET_KEY as string
 
 class JwtUtils{
     static generateAccessToken(paylaod:object):string{
-        return jwt.sign(paylaod,accessSecret,{expiresIn:'1h'})
+        return jwt.sign(paylaod,accessSecret,{expiresIn:'15m'})
     }
 
     static generateRefreshToken(paylaod:object):string{
-        return jwt.sign(paylaod,accessSecret,{expiresIn:'7d'})
+        return jwt.sign(paylaod,refreshSecret,{expiresIn:'7d'})
     }
 
-    static verifyToken(token:string,isRefreshToken=false): string | JwtPayload | null{
+    static verifyToken(token:string,isRefreshToken=false): string | jwt.JwtPayload | null{
   
        try {
         const secret=isRefreshToken ? refreshSecret :accessSecret;
-        return jwt.verify(token,secret)
+       
+        const decoded= jwt.verify(token,secret)
+        return decoded
         
        } catch (error) {
-          return null
+        if (error instanceof jwt.TokenExpiredError) {
+            console.error("Token has expired");
+          } else if (error instanceof jwt.JsonWebTokenError) {
+            console.error("Invalid token signature");
+          }
+          
+          return null;
+         
        }
 
     }

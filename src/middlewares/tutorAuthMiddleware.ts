@@ -2,21 +2,21 @@ import { Request, Response, NextFunction } from "express";
 import JwtUtils from "../utils/jwtUtils";
 
 export interface CustomRequest extends Request {
-  user?: string;
+  tutor?: string;
   
 }
 
-const authenticationMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const tutorAuthMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '').trim();
-    console.log("user side auth")
+    console.log("tutor side auth")
     if (!token) {
       throw new Error('Authentication failed. Token missing.');
     }
    
     const decoded = JwtUtils.verifyToken(token)
-    if (!decoded || typeof decoded !== "object" || !decoded.userId) {
-     res.status(401).json({
+    if (!decoded || typeof decoded !== "object" || !decoded.tutorId) {
+      res.status(401).json({
         message: "Authentication failed. Invalid token.",
         details: "Token verification failed or invalid token structure.",
       });
@@ -24,7 +24,7 @@ const authenticationMiddleware = async (req: CustomRequest, res: Response, next:
     }
 
 
-    req.user = decoded.userId;
+    req.tutor = decoded.tutorId;
     next();
   } catch (error) {
     console.error("Authentication error:", error);
@@ -35,4 +35,4 @@ const authenticationMiddleware = async (req: CustomRequest, res: Response, next:
   }
 }
 
-export default authenticationMiddleware;
+export default tutorAuthMiddleware;

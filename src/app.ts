@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import adminRoute from './routes/admin/adminRoute'
 import userRoute from './routes/user/userRoute'
 import tutorRoute from './routes/tutor/tutorRoute'
+import cookieParser from 'cookie-parser'
 
 
 
@@ -25,6 +26,7 @@ app.use(cors({
 app.use(json());
 app.use(urlencoded({extended:true}))
 
+app.use(cookieParser());
 
 connectdb();
 

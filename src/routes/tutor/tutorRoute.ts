@@ -3,6 +3,7 @@ import TutorController from "../../controllers/tutor/tutorController";
 import TutorService from "../../services/tutor/tutorService";
 import TutorRepositoryImplemenation from "../../repositories/implementation/tutor/tutorRepositoryImplementation";
 import tutorUpload from "../../middlewares/tutorUploadMiddleware";
+import tutorAuthMiddleware from "../../middlewares/tutorAuthMiddleware";
 
 const router=Router()
 

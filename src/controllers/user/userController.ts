@@ -206,19 +206,32 @@ class UserController {
         password
       );
 
+     
+
       if (!user) {
+       
         if (message === "No user is registered with this email") {
           res.status(404).json({ message });
           return;
         }
 
         if (message === "Invalid password") {
-          res.status(401).json(message);
+          res.status(401).json({message});
           return;
         }
+        if(message ==="Your account is blocked"){
+          res.status(403).json({message})
+          return
+        }
+
+        res.status(400).json({ message: "Authentication failed" });
+        return;
       }
 
-      const payload = { userId: user!._id };
+
+    
+      
+      const payload = { userId: user._id };
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 
@@ -235,13 +248,55 @@ class UserController {
         user,
       });
     } catch (error) {
+     
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(500).json({ error: errorMessage });
     }
   }
+
+//user refresh token
+  async refreshToken(req:Request,res:Response):Promise<void>{
+    try {
+
+       
+        const refreshToken =req.cookies.userRefreshToken;
+        
+        if(!refreshToken){
+            res.status(401).json({message:"Refresh token missing"});
+            return;
+        }
+
+        const decoded =JwtUtils.verifyToken(refreshToken,true);
+      
+
+      
+        if(!decoded){
+            res.status(401).json({message:"Invalid Refresh token"});
+            return;
+
+        }
+        
+        const payload={userId:(decoded as {userId:string}).userId}
+
+        const newAccessToken=JwtUtils.generateAccessToken(payload)
+       
+        console.log("new AccessToken refreshed:",newAccessToken)
+    
+        res.status(200).json({accessToken:newAccessToken})
+    } catch (error) {
+        console.error("Error in token refresh:",error);
+        res.status(500).json({message:"An unexpected error occured"})
+
+
+        
+    }
+}
+
+
+
 
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {

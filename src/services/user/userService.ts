@@ -183,13 +183,18 @@ class UserService {
     email: string,
     password: string
   ): Promise<{ user: IUser | null; message: string }> {
+
+
     const user = await this.userRepository.findUserByEmail(email);
+
     if (!user) {
+      console.log('No user found with email');
       return { user: null, message: "No user is registered with this email" };
     }
 
     if (!user.isActive) {
-      return { user: null, message: " You account is inactive" };
+      console.log('User account is blocked');
+      return { user: null, message: "Your account is blocked" };
     }
 
     const comparePassword = await PasswordUtils.comparePassword(
@@ -202,6 +207,8 @@ class UserService {
 
     return { user: user, message: " User is Authenticated" };
   }
+
+  
 
   //user forgot password
 

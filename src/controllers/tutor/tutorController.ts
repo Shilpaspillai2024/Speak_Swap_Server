@@ -205,6 +205,47 @@ class TutorController {
     }
   }
 
+
+//tutor refresh token
+async refreshToken(req:Request,res:Response):Promise<void>{
+  try {
+
+     
+      const refreshToken =req.cookies.tutorRefreshToken;
+      
+      if(!refreshToken){
+          res.status(401).json({message:"Refresh token missing"});
+          return;
+      }
+
+      const decoded =JwtUtils.verifyToken(refreshToken,true);
+    
+
+    
+      if(!decoded){
+          res.status(401).json({message:"Invalid Refresh token"});
+          return;
+
+      }
+      
+      const payload={tutorId:(decoded as {tutorId:string}).tutorId}
+
+      const newAccessToken=JwtUtils.generateAccessToken(payload)
+     
+      console.log("new AccessToken refreshed:",newAccessToken)
+  
+      res.status(200).json({accessToken:newAccessToken})
+  } catch (error) {
+      console.error("Error in token refresh:",error);
+      res.status(500).json({message:"An unexpected error occured"})
+
+
+      
+  }
+}
+
+
+
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
