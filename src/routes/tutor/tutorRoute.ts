@@ -23,11 +23,16 @@ router.post("/signup/profile",tutorUpload.fields([{name:"profilePhoto",maxCount:
     {name:"introductionVideo",maxCount:1}
 ]),(req,res)=>tutorController.tutorProfile(req,res))
 
-router.post("/login",(req,res)=>tutorController.tutorLogin(req,res))
-
 router.post("/forgot-password",(req,res)=>tutorController.forgotPassword(req,res))
 router.post("/verify-otp",(req,res)=>tutorController.verifyForgotPasswordOtp(req,res))
 router.post("/reset-password",(req,res)=>tutorController.resetPassword(req,res))
+
+
+router.post("/login",(req,res)=>tutorController.tutorLogin(req,res))
+
+router.post('/refresh-token',(req,res)=>tutorController.refreshToken(req,res))
+
+
 
 
 

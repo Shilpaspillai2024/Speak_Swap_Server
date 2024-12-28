@@ -9,7 +9,7 @@ export interface CustomRequest extends Request {
 const authenticationMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '').trim();
-    console.log("user side auth")
+    
     if (!token) {
       throw new Error('Authentication failed. Token missing.');
     }

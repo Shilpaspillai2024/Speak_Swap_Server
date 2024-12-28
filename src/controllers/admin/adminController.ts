@@ -38,11 +38,22 @@ class AdminController{
 
             res.cookie("adminRefreshToken",refreshToken,{
                 httpOnly:true,
-                secure:process.env.NODE_ENV==="production",
-                sameSite:"none",
-                maxAge:7 * 24 * 60 * 60 * 1000,// 7days
+                secure:process.env.NODE_ENV ==='production',
+                sameSite:process.env.NODE_ENV ==='production'?'none':'lax',
+                maxAge:7 * 24 * 60 * 60 * 1000,// 7days,
+                path:"/"
             });
-            console.log("success")
+             // Log the cookie being set
+        console.log('Setting refresh token cookie:', {
+            token: refreshToken,
+            options: {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            }
+        });
 
             res.status(200).json({
                 message:"Login SuccessFull",
@@ -65,8 +76,10 @@ class AdminController{
     async refreshToken(req:Request,res:Response):Promise<void>{
         try {
 
+            console.log("Cookies:", req.cookies);
            
             const refreshToken =req.cookies.adminRefreshToken;
+            console.log("refreshtoken:",refreshToken)
             
             if(!refreshToken){
                 res.status(401).json({message:"Refresh token missing"});
@@ -157,6 +170,121 @@ class AdminController{
           });
     } catch (error) {
         console.error("Error updating user status:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+        
+    }
+   }
+
+
+
+   async getTutors(req:CustomRequest,res:Response):Promise<void>{
+    try {
+      
+        if(!req.admin){
+            res.status(403).json({message:"Access denied admins only"})
+            return;
+
+        }
+
+        const tutor=await this.adminService.getTutors();
+        console.log("fetched tutors:",tutor);
+        if (!tutor) {
+            res.status(404).json({message: "No tutors found"});
+            return;
+        }
+        res.status(200).json({message:" tutors fetched Successfully",tutor});
+        
+    } catch (error) {
+        console.error("Error in fetching tutors:",error)
+        res.status(500).json({message:"failed to fetch tutor details"})
+        
+    }
+   }
+
+
+   async getPendingTutors(req:CustomRequest,res:Response):Promise<void>{
+    try {
+       
+
+        if(!req.admin){
+            res.status(403).json({message:"Access denied Admins only"});
+            return;
+        }
+        const pendingTutors=await this.adminService.getPendingTutors()
+     res.status(200).json({ message: "pending tutors fetched successfully",tutors:pendingTutors});
+      
+    } catch (error) {
+      console.error("Error fetching pending tutors:", error);
+      res.status(500).json({message:"Failed to fetch pending tutors"})
+      
+    }
+  }
+
+
+  async tutorVerify(req:CustomRequest,res:Response):Promise<void>{
+    try {
+
+        const {tutorId}=req.params;
+       
+        const {status}=req.body;
+      
+
+
+        if(!status || !['approved','rejected'].includes(status)){
+            res.status(400).json({message:"Invalid status only approved or rejected"})
+            return;
+        }
+
+        const isActive=status==="approved" ? true :false
+
+        const verifyTutor=await this.adminService.tutorVerify(tutorId,status,isActive);
+        if(!verifyTutor){
+            res.status(404).json({ message: 'Tutor not found.' });
+            return;
+        }
+        res.status(200).json({ message: `Tutor ${status} successfully.`, tutor: verifyTutor });
+    } catch (error) {
+        console.error("Error updating tutor verification:", error);
+        res.status(500).json({ message: 'An unexpected error occurred.' });
+    }
+  }
+
+
+
+  
+   // block unblock tutor
+
+   async blockUnblockTutor(req:CustomRequest,res:Response):Promise<void>{
+    try {
+        
+        if(!req.admin){
+            res.status(403).json({message:"Access denied Admins only"});
+            return;
+
+        }
+
+        const {tutorId}=req.params;
+        const{isActive}=req.body;
+
+
+        if(typeof isActive !=='boolean'){
+            res.status(400).json({ message: "Invalid 'isActive' value. Must be a boolean." });
+            return;
+        }
+
+        const updateStatus=await this.adminService.updateTutorStatus(tutorId,isActive)
+
+        if (!updateStatus) {
+            res.status(404).json({ message: "Tutor not found." });
+            return;
+          }
+
+          res.status(200).json({
+            message: `Tutor ${isActive ? "unblocked" : "blocked"} successfully.`,
+            tutor: updateStatus,
+          });
+    } catch (error) {
+        console.error("Error updating tutor status:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
         
     }

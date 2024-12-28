@@ -197,6 +197,9 @@ class UserController {
     }
   }
 
+
+
+  
   async postLogin(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
@@ -237,8 +240,8 @@ class UserController {
 
       res.cookie("userRefreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        secure:process.env.NODE_ENV ==='production',
+        sameSite:process.env.NODE_ENV ==='production'?'none':'lax',
         maxAge: 1 * 60 * 60 * 1000, 
       });
 
@@ -263,6 +266,7 @@ class UserController {
 
        
         const refreshToken =req.cookies.userRefreshToken;
+        console.log("Cookies:", req.cookies);
         
         if(!refreshToken){
             res.status(401).json({message:"Refresh token missing"});
@@ -381,6 +385,85 @@ class UserController {
     } catch (error) {
       res.status(500).json({message:"fetch user details error"})
       
+    }
+  }
+
+
+
+  async getUser(req:CustomRequest,res:Response):Promise<void>{
+    try {
+      const {id}=req.params;
+
+      if(!id){
+        res.status(400).json({message:"user id is required"})
+        return;
+      }
+
+      const user=await this.userService.getUser(id)
+
+      if (!user) {
+        res.status(404).json({ message: "User not found." });
+        return;
+      }
+      res.status(200).json(user);
+      
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  }
+
+
+  async getLoggedUser(req:CustomRequest,res:Response):Promise<void>{
+    try {
+
+      const userId=req.user
+      if (!userId) {
+        res.status(400).json({ message: "User ID is required" });
+        return;
+      }
+  
+      const user = await this.userService.getLoggedUser(userId);
+  
+      if (!user) {
+        res.status(404).json({ message: "User not found." });
+        return;
+      }
+  
+      res.status(200).json(user);
+      
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  }
+
+
+
+
+  async updateUser(req:CustomRequest,res:Response):Promise<void>{
+
+    try {
+      const userId=req.user;
+      
+      if (!userId) {
+        res.status(400).json({ success: false, message: 'User ID is required' });
+        return;
+      }
+      
+      const updateData=req.body;
+
+     
+
+      const updatedUser=await this.userService.updateUser(userId,updateData)
+
+      if (!updatedUser) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+
+      res.status(200).json({ success: true, message: 'User updated successfully', data: updatedUser });
+
+    } catch (error:any) {
+      res.status(500).json({ success: false, message: error.message || 'An error occurred' });
     }
   }
 }

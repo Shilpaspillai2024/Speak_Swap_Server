@@ -121,7 +121,6 @@ class TutorService {
     return tutor;
   }
 
-
   //step 4 of  tutor signup
   async setTutorprofile(
     tutorId: string,
@@ -172,110 +171,130 @@ class TutorService {
         const certPath = certificate;
         const certResult = await cloudinary.uploader.upload(certPath, {
           folder: "tutor/certificates",
+          resource_type: "raw",
           use_filename: true,
           unique_filename: true,
         });
+
+        console.log(" pdf url :", certResult.secure_url);
         certificateUrls.push(certResult.secure_url);
       }
       details.certificates = certificateUrls;
     }
 
-    
     Object.assign(tutor, details);
-    tutor.status="pending"
+    tutor.status = "pending";
     await tutor.save();
     return tutor;
   }
 
-// tutor login
+  // tutor login
 
-async authenticateTutor(email:string,password:string):Promise<{tutor:ITutor |null,message:string}>{
+  async authenticateTutor(
+    email: string,
+    password: string
+  ): Promise<{ tutor: ITutor | null; message: string }> {
+    const tutor = await this.tutorRepository.findTutorByEmail(email);
+    if (!tutor) {
+      return { tutor: null, message: "No tutor is registered with this email" };
+    }
 
+    // Check if the account is pending
+    if (tutor.status === "pending") {
+      return {
+        tutor: null,
+        message:
+          "Your account is currently inactive. It will be activated within 48 hours.",
+      };
+    }
 
-  const tutor=await this.tutorRepository.findTutorByEmail(email);
-  if(!tutor){
-    return {tutor:null,message:'No tutor is registered with this email'}
+    // Check if the account is rejected
+    if (tutor.status === "rejected") {
+      return {
+        tutor: null,
+        message:
+          "Your account has been rejected. Please contact support for assistance.",
+      };
+    }
+
+    if (tutor.status === "approved" && !tutor.isActive) {
+      console.log("Tutor account is blocked");
+      return { tutor: null, message: "Your account is blocked" };
+    }
+
+    const comparePassword = await PasswordUtils.comparePassword(
+      password,
+      tutor.password
+    );
+    if (!comparePassword) {
+      return { tutor: null, message: "Invalid Password" };
+    }
+
+    return { tutor: tutor, message: " tutor is Authenticated" };
   }
 
+  //tutor forgot password
 
-  const comparePassword=await PasswordUtils.comparePassword(password,tutor.password);
-  if(!comparePassword){
-    return{tutor:null,message:"Invalid Password"}
+  async sendForgotPasswordOtp(email: string): Promise<{ message: string }> {
+    const tutor = await this.tutorRepository.findTutorByEmail(email);
+
+    if (!tutor) {
+      throw new Error("tutor not found");
+    }
+
+    //generate 4 digit otp
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const otpExpiration = new Date();
+
+    otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+
+    tutor.otp = otp;
+    tutor.otpExpiration = otpExpiration;
+    await tutor.save();
+
+    const response = await EmailUtils.sendOtp(tutor.email, otp);
+    return { message: "OTP sent successfully to email" };
   }
 
-  return{tutor:tutor,message:" tutor is Authenticated"}
-}
+  //forgotpassword verify
 
+  async verifyForgotPassword(email: string, otp: string): Promise<string> {
+    const tutor = await this.tutorRepository.findTutorByEmail(email);
 
-//tutor forgot password
+    if (!tutor) {
+      throw new Error("tutor not found");
+    }
 
-async sendForgotPasswordOtp(email: string): Promise<{ message: string }> {
-  const tutor = await this.tutorRepository.findTutorByEmail(email);
+    if (tutor.otp !== otp) {
+      throw new Error("Invalid otp");
+    }
 
-  if (!tutor) {
-    throw new Error("tutor not found");
+    if (new Date() > tutor.otpExpiration!) {
+      throw new Error("otp has expired");
+    }
+
+    tutor.isVerified = true;
+    tutor.otp = undefined;
+    tutor.otpExpiration = undefined;
+    await tutor.save();
+
+    return "OTP verified successfully";
   }
 
-  //generate 4 digit otp
-  const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  const otpExpiration = new Date();
+  // forgot password reset
 
-  otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+  async resetPassword(email: string, newPassword: string): Promise<ITutor> {
+    const tutor = await this.tutorRepository.findTutorByEmail(email);
 
-  tutor.otp = otp;
-  tutor.otpExpiration = otpExpiration;
-  await tutor.save();
+    if (!tutor) {
+      throw new Error("tutor not found");
+    }
 
-  const response = await EmailUtils.sendOtp(tutor.email, otp);
-  return { message: "OTP sent successfully to email" };
-}
-
-//forgotpassword verify
-
-async verifyForgotPassword(email: string, otp: string): Promise<string> {
-  const tutor = await this.tutorRepository.findTutorByEmail(email);
-
-  if (!tutor) {
-    throw new Error("tutor not found");
+    const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+    tutor.password = hashedPassword;
+    await tutor.save();
+    return tutor;
   }
-
-  if (tutor.otp !== otp) {
-    throw new Error("Invalid otp");
-  }
-
-  if (new Date() > tutor.otpExpiration!) {
-    throw new Error("otp has expired");
-  }
-
-  tutor.isVerified = true;
-  tutor.otp = undefined;
-  tutor.otpExpiration = undefined;
-  await tutor.save();
-
-  return "OTP verified successfully";
-}
-
-// forgot password reset
-
-async resetPassword(email: string, newPassword: string): Promise<ITutor> {
-  const tutor = await this.tutorRepository.findTutorByEmail(email);
-
-  if (!tutor) {
-    throw new Error("tutor not found");
-  }
-
-  const hashedPassword = await PasswordUtils.hashPassword(newPassword);
-  tutor.password = hashedPassword;
-  await tutor.save();
-  return tutor;
-}
-
-
-
-
-
-
-
 }
 
 export default TutorService;

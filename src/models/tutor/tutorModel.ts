@@ -2,9 +2,6 @@
 import{Schema,model}from "mongoose";
 import { ITutor } from "../../types/ITutor";
 
-
-
-
 const tutorSchema=new Schema<ITutor>({
     name:{
         type:String,

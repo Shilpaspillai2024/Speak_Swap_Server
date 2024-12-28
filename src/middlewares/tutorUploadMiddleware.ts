@@ -21,7 +21,7 @@ const tutorfileFilter =(req:Request,file:Express.Multer.File,cb:(error:any,accep
         cb(null, true); 
       } else {
         
-        cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed!'), false); 
+        cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WEBP  and PDFs are allowed!'), false); 
       }
 }
 

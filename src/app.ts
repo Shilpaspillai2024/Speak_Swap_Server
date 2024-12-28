@@ -17,16 +17,36 @@ dotenv.config()
 const port=process.env.PORT || 5000
 const app=express();
 
-app.use(cors({
-  origin: 'http://localhost:3000',  // Allow only frontend origin
-  credentials: true,  // Allow credentials like cookies
-}));
-
-
 app.use(json());
 app.use(urlencoded({extended:true}))
 
 app.use(cookieParser());
+
+
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+//   next();
+// });
+
+app.use(cors({
+  origin: 'http://localhost:3000',  // Allow only frontend origin
+  credentials: true,  // Allow credentials like cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['set-cookie']
+}));
+
+
+
+
+
+// app.use((req, res, next) => {
+//   console.log('Request path:', req.path);
+//   console.log('Request cookies:', req.cookies);
+//   console.log('Cookie header:', req.headers.cookie);
+//   next();
+// });
 
 connectdb();
 

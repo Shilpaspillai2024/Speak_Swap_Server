@@ -13,7 +13,7 @@ const storage =multer.diskStorage({
 })
 
 const fileFilter =(req:Request,file:Express.Multer.File,cb:(error:any,acceptFile:boolean)=>void)=>{
-    const allowedMimeTypes=['image/jpeg','image/png','image/gif', 'image/webp']
+    const allowedMimeTypes=['image/jpeg','image/png','image/gif', 'image/webp',]
 
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true); 

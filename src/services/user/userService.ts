@@ -282,6 +282,27 @@ class UserService {
   async deleteuser(id:string):Promise<IUser | null>{
     return await this.userRepository.deleteUser(id)
   }
+
+  async getUser(id:string):Promise<IUser | null>{
+    return await this.userRepository.findUserById(id)
+  }
+
+  async getLoggedUser(id:string):Promise<IUser | null>{
+    return await this.userRepository.findUserById(id)
+  }
+
+
+  async updateUser(id:string,updateData:Partial<IUser>):Promise<IUser | null>{
+    if(!id){
+      throw new Error("User id is required")
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new Error('No data provided for update');
+    }
+
+    return await this.userRepository.updateUser(id,updateData)
+  }
 }
 
 export default UserService;

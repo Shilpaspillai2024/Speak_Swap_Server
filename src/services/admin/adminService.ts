@@ -1,6 +1,7 @@
 import { IAdmin } from "../../models/admin/adminModel";
 import AdminRepository from "../../repositories/admin/adminRepository";
 import { IUser } from "../../models/user/userModel";
+import { ITutor } from "../../types/ITutor";
 
 
 class AdminService{
@@ -21,11 +22,32 @@ class AdminService{
 
     async getAllUser():Promise<IUser[]>{
 
-        return await this.adminRepository.getAllUser()
+        return await this.adminRepository.getAllUser();
     }
 
     async updateUserStatus(userId:string,isActive:boolean):Promise<IUser | null>{
-        return await this.adminRepository.updateUserStatus(userId,isActive)
+        return await this.adminRepository.updateUserStatus(userId,isActive);
+    }
+
+
+
+    async getTutors():Promise<ITutor[]>{
+        return await this.adminRepository.getTutors();
+
+    }
+
+    async getPendingTutors():Promise<ITutor[]>{
+        return await this.adminRepository.getPendingTutors();
+
+    }
+
+
+    async tutorVerify(tutorId:string,status:string,isActive:boolean):Promise<ITutor | null>{
+        return await this.adminRepository.tutorVerify(tutorId,status,isActive)
+    }
+
+    async updateTutorStatus(tutorId:string,isActive:boolean):Promise<ITutor | null>{
+        return await this.adminRepository.updateTutorStatus(tutorId,isActive);
     }
 }
 

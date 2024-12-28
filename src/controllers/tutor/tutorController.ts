@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import TutorService from "../../services/tutor/tutorService";
 import JwtUtils from "../../utils/jwtUtils";
+import { CustomRequest } from "../../middlewares/tutorAuthMiddleware";
 
 class TutorController {
   private tutorService: TutorService;
@@ -177,7 +178,20 @@ class TutorController {
         if (message === "Invalid password") {
           res.status(401).json({ message});
           return;
+      
         }
+       if(message === "Your account is blocked"){
+        res.status(403).json({ message });
+        return;
+       }
+ 
+
+       if (message === "Your account is currently inactive. It will be activated within 48 hours." || 
+        message === "Your account has been rejected. Please contact support for assistance.") {
+      res.status(403).json({ message });
+      return;
+    }
+       
       }
 
       const payload = { tutorId: tutor!._id };
@@ -186,13 +200,13 @@ class TutorController {
 
       res.cookie("tutorRefreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        secure:process.env.NODE_ENV ==='production',
+        sameSite:process.env.NODE_ENV ==='production'?'none':'lax',
         maxAge: 1 * 60 * 60 * 1000, // 1hr
       });
 
       res.status(200).json({
-        message: "Login Successfull",
+        message: "Welcome to the tutors Dashboard",
         accessToken,
         tutor
       });
@@ -311,6 +325,9 @@ async refreshToken(req:Request,res:Response):Promise<void>{
     }
   }
 
+
+
+  
 
 }
 
