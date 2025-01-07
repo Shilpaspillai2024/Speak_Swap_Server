@@ -1,4 +1,5 @@
-import { Schema,model,Document, ObjectId } from "mongoose";
+import mongoose, { Schema,model,Document, ObjectId } from "mongoose";
+
 
 interface IUser extends Document{
     _id:ObjectId;
@@ -19,6 +20,7 @@ interface IUser extends Document{
     otp?:string;
     otpExpiration?:Date;
     isVerified:boolean;
+    role: "user" | "tutor";
     
 
 }
@@ -93,12 +95,17 @@ const userSchema =new Schema<IUser>({
     isVerified:{
         type:Boolean,
         default:false
-    }
+    },
+    role: {
+        type: String,
+        enum: ["user", "tutor"],
+        default: "user",
+      },
     
 
 })
 
 
-const User =model<IUser>('User',userSchema)
+const User =mongoose.model<IUser>('User',userSchema)
 
 export {User,IUser}

@@ -21,7 +21,7 @@ export interface ITutor extends Document{
     introductionVideo:string;
     createdAt:Date;
     updatedAt:Date;
-    status:"pending" | "approved" | "rejected"
-
+    status:"pending" | "approved" | "rejected";
+    role: "user" | "tutor";
     
 }

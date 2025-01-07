@@ -1,5 +1,5 @@
 
-import{Schema,model}from "mongoose";
+import mongoose, {Schema,model}from "mongoose";
 import { ITutor } from "../../types/ITutor";
 
 const tutorSchema=new Schema<ITutor>({
@@ -71,14 +71,19 @@ const tutorSchema=new Schema<ITutor>({
         enum:["pending","approved","rejected"],
         default:"pending"
 
-    }
+    },
+    role: {
+        type: String,
+        enum: ["user", "tutor"],
+        default: "tutor",
+      },
     
 
    
 },{timestamps:true})
 
 
-const Tutor= model<ITutor>('Tutor',tutorSchema)
+const Tutor=mongoose.model<ITutor>('Tutor',tutorSchema)
 
 export {Tutor}
 

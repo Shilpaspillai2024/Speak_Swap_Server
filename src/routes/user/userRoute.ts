@@ -5,8 +5,8 @@ import UserRepositoryImplementation from "../../repositories/implementation/user
 import GeoController from "../../controllers/user/geoController";
 import GeoService from "../../services/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
-import authenticationMiddleware from "../../middlewares/authenticationMiddleware";
-
+// import authenticationMiddleware from "../../middlewares/authenticationMiddleware";
+import authMiddleware from "../../middlewares/authMiddleware";
 const router=Router()
 
 const userRepository =new UserRepositoryImplementation();
@@ -42,12 +42,12 @@ router.post('/refresh-token',(req,res)=>userController.refreshToken(req,res))
 
 
 
-router.get("/users",authenticationMiddleware,(req,res)=>userController.getAllUsers(req,res))
+router.get("/users",authMiddleware,(req,res)=>userController.getAllUsers(req,res))
 
 
-router.get("/user/:id",authenticationMiddleware,(req,res)=>userController.getUser(req,res))
+router.get("/user/:id",authMiddleware,(req,res)=>userController.getUser(req,res))
 
-router.get("/profile",authenticationMiddleware,(req,res)=>userController.getLoggedUser(req,res))
+router.get("/profile",authMiddleware,(req,res)=>userController.getLoggedUser(req,res))
 
-router.put('/update',authenticationMiddleware,(req,res)=>userController.updateUser(req,res))
+router.put('/update',authMiddleware,(req,res)=>userController.updateUser(req,res))
 export default router;

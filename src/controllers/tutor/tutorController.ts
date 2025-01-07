@@ -194,7 +194,9 @@ class TutorController {
        
       }
 
-      const payload = { tutorId: tutor!._id };
+      const role="tutor"
+
+      const payload = { tutorId: tutor!._id,role};
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 
@@ -208,7 +210,8 @@ class TutorController {
       res.status(200).json({
         message: "Welcome to the tutors Dashboard",
         accessToken,
-        tutor
+        tutor,
+        role,
       });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
