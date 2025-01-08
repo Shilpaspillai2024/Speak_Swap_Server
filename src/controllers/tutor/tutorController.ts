@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import TutorService from "../../services/tutor/tutorService";
 import JwtUtils from "../../utils/jwtUtils";
-import { CustomRequest } from "../../middlewares/tutorAuthMiddleware";
+// import { CustomRequest } from "../../middlewares/tutorAuthMiddleware";
+import { CustomRequest } from "../../middlewares/authMiddleware";
 
 class TutorController {
   private tutorService: TutorService;
@@ -329,6 +330,33 @@ async refreshToken(req:Request,res:Response):Promise<void>{
   }
 
 
+
+  //get tutor
+
+  async getTutor(req:CustomRequest,res:Response):Promise<void>{
+      try {
+  
+        const tutorId=req.user
+
+        console.log("tutorId",tutorId)
+        if (!tutorId) {
+          res.status(400).json({ message: "tutor ID is required" });
+          return;
+        }
+    
+        const tutor = await this.tutorService.getTutor(tutorId)
+      console.log("tutor",tutor)
+        if (!tutor) {
+          res.status(404).json({ message: "Tutor not found." });
+          return;
+        }
+    
+        res.status(200).json(tutor);
+        
+      } catch (error) {
+        res.status(500).json({ message: "Internal server error." });
+      }
+    }
 
   
 

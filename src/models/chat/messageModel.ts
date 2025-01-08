@@ -5,8 +5,8 @@ interface IMessage extends Document{
     chatId:ObjectId;
     senderId:ObjectId;
     senderRole:"user"|"tutor";
-    reciepientId:ObjectId;
-    reciepientRole:"user"|"tutor";
+    // reciepientId:ObjectId;
+    // reciepientRole:"user"|"tutor";
     message:string;
     timestamp:Date;
     isRead:boolean;
@@ -30,16 +30,16 @@ const messageSchema = new Schema<IMessage>(
         required: true,
       },
 
-      reciepientId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        refPath: "reciepientRole",
-      },
-    reciepientRole: {
-        type: String,
-        enum: ["user", "tutor"],
-        required: true,
-      },
+    //   reciepientId: {
+    //     type: Schema.Types.ObjectId,
+    //     required: true,
+    //     refPath: "reciepientRole",
+    //   },
+    // reciepientRole: {
+    //     type: String,
+    //     enum: ["user", "tutor"],
+    //     required: true,
+    //   },
      
       message: {
         type: String,

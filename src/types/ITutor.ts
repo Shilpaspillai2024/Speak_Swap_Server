@@ -1,6 +1,17 @@
 import { ObjectId,Document } from "mongoose";
 
 
+interface ITimeSlot {
+    startTime: string;
+    endTime: string;
+  }
+  
+  
+  interface IAvailability {
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    slots: ITimeSlot[];
+  }
+
 export interface ITutor extends Document{
     _id:ObjectId
     name:string,
@@ -23,5 +34,5 @@ export interface ITutor extends Document{
     updatedAt:Date;
     status:"pending" | "approved" | "rejected";
     role: "user" | "tutor";
-    
+    availability: IAvailability[];
 }

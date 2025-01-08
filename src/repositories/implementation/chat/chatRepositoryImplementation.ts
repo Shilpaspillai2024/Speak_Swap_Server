@@ -84,10 +84,7 @@ async getChatsByParticipant(participantId: string): Promise<IChat[]> {
       .populate({
         path: 'participants.participantId',
         select: 'fullName profilePhoto name profilePhoto', 
-        populate: {
-          path: 'participantId', 
-          select: 'fullName profilePhoto name profilePhoto',
-        }
+       
       })
       .exec();
 

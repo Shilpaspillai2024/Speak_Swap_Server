@@ -295,6 +295,14 @@ class TutorService {
     await tutor.save();
     return tutor;
   }
+
+
+  // get tutor 
+
+  async getTutor(id:string):Promise<ITutor | null>{
+    return await this.tutorRepository.findTutorById(id)
+  }
+
 }
 
 export default TutorService;

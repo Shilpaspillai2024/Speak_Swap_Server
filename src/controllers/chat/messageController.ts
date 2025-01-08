@@ -9,11 +9,23 @@ class MessageController{
         this.messageService=messageService;
     }
 
-    async createMessage(req: Request, res: Response): Promise<void> {
-        const { chatId, senderId, senderRole,recipientId,recipientRole, message } = req.body;
+    // async createMessage(req: Request, res: Response): Promise<void> {
+    //     const { chatId, senderId, senderRole,recipientId,recipientRole, message } = req.body;
+    
+    //     try {
+    //       const newMessage = await this.messageService.createMessage(chatId, senderId, senderRole,recipientId,recipientRole,message);
+    //       res.status(201).json(newMessage);
+    //     } catch (error: any) {
+    //       res.status(500).json({ error: error.message });
+    //     }
+    //   }
+
+
+      async createMessage(req: Request, res: Response): Promise<void> {
+        const { chatId, senderId, senderRole, message } = req.body;
     
         try {
-          const newMessage = await this.messageService.createMessage(chatId, senderId, senderRole,recipientId,recipientRole,message);
+          const newMessage = await this.messageService.createMessage(chatId, senderId, senderRole,message);
           res.status(201).json(newMessage);
         } catch (error: any) {
           res.status(500).json({ error: error.message });

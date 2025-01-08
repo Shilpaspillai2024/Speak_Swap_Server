@@ -33,7 +33,7 @@ router.post("/login",(req,res)=>tutorController.tutorLogin(req,res))
 
 router.post('/refresh-token',(req,res)=>tutorController.refreshToken(req,res))
 
-
+router.get('/profile',authMiddleware,(req,res)=>tutorController.getTutor(req,res))
 
 
 

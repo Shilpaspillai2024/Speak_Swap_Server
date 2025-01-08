@@ -24,7 +24,8 @@ class AdminController{
                 return
             }
 
-           
+           console.log("admin password ",password)
+           console.log("isAdminpasword",isAdmin.password)
             if(password !==isAdmin.password){
                  res.status(401).json({message:"incorrect password"})
                  return

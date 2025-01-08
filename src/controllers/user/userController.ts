@@ -1,7 +1,8 @@
 import UserService from "../../services/user/userService";
 import { Request, Response } from "express";
 import JwtUtils from "../../utils/jwtUtils";
-import { CustomRequest } from "../../middlewares/authenticationMiddleware";
+// import { CustomRequest } from "../../middlewares/authenticationMiddleware";
+import { CustomRequest } from "../../middlewares/authMiddleware";
 
 class UserController {
   private userService: UserService;

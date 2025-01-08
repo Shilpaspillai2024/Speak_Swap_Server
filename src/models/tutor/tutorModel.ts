@@ -2,6 +2,27 @@
 import mongoose, {Schema,model}from "mongoose";
 import { ITutor } from "../../types/ITutor";
 
+const availabilitySchema=new Schema({
+    day: {
+        type: String,
+        enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        required: true,
+      },
+      slots: [
+        {
+          startTime: {
+            type: String,
+            required: true, 
+          },
+          endTime: {
+            type: String,
+            required: true, 
+          },
+        },
+      ],
+
+})
+
 const tutorSchema=new Schema<ITutor>({
     name:{
         type:String,
@@ -78,7 +99,7 @@ const tutorSchema=new Schema<ITutor>({
         default: "tutor",
       },
     
-
+      availability: [availabilitySchema]
    
 },{timestamps:true})
 

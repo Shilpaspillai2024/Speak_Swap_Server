@@ -22,6 +22,8 @@ class TutorRepositoryImplemenation implements TutorRepository{
       async updateTutor(id: string, update: Partial<ITutor>): Promise<ITutor | null> {
           return await Tutor.findByIdAndUpdate(id,update,{new:true})
       }
+
+     
   
 
 }
