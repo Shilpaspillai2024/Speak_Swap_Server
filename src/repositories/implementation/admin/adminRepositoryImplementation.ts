@@ -6,7 +6,7 @@ import { Tutor } from "../../../models/tutor/tutorModel";
 
 class AdminRepositoryImplemenation implements AdminRepository {
   async findByEmail(email: string): Promise<IAdmin | null> {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ email,role:"admin" });
 
     return admin;
   }

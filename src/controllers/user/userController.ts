@@ -234,8 +234,8 @@ class UserController {
 
 
     
-      const role="user"
-      const payload = { userId: user._id,role};
+    
+      const payload = { userId: user._id,role:user.role};
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 
@@ -250,7 +250,7 @@ class UserController {
         message: "Login Successfull",
         accessToken,
         user,
-        role
+        
       });
     } catch (error) {
      
@@ -285,7 +285,10 @@ class UserController {
 
         }
         
-        const payload={userId:(decoded as {userId:string}).userId}
+        const payload={
+          userId:(decoded as {userId:string}).userId,
+          role: (decoded as { role: string }).role,
+        }
 
 
  

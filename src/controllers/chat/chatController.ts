@@ -5,6 +5,7 @@ import { Chat } from "../../models/chat/chatModel";
 
 class ChatController{
     private chatService:ChatService;
+     
 
     constructor(chatService:ChatService){
         this.chatService=chatService
@@ -64,14 +65,10 @@ class ChatController{
 
 
     async updateLastMessage(req:Request,res:Response):Promise<void>{
-        const{chatId,message,timestamp}=req.body
+        const{chatId,message,timestamp,unreadCount}=req.body
         try {
-            console.log("Received request to update last message...");
-        console.log("Request Body:", req.body);
-        console.log("Chat ID:", chatId);
-        console.log("Message:", message);
-        console.log("Timestamp:", timestamp);
-            await this.chatService.updateLastMessage(chatId,message,new Date(timestamp))
+           
+            await this.chatService.updateLastMessage(chatId,message,new Date(timestamp),unreadCount)
             res.status(200).json({success:true})
         } catch (error:any) {
             res.status(500).json({ error: error.message });

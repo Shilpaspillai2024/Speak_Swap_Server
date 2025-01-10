@@ -27,9 +27,10 @@ class ChatService{
    async updateLastMessage(
       chatId: string,
       message: string,
-      timestamp: Date
+      timestamp: Date,
+      unreadCount:number,
     ): Promise<void>{
-        return await this.chatRepository.updateLastMessage(chatId,message,timestamp)
+        return await this.chatRepository.updateLastMessage(chatId,message,timestamp,unreadCount)
     }
 }
 

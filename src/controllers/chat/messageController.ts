@@ -1,24 +1,18 @@
 import { Request,Response } from "express";
 import MessageService from "../../services/chat/messageService";
+import ChatService from "../../services/chat/chatService";
 
 class MessageController{
     private messageService:MessageService;
 
 
-    constructor(messageService:MessageService){
-        this.messageService=messageService;
-    }
+    private chatService:ChatService;
 
-    // async createMessage(req: Request, res: Response): Promise<void> {
-    //     const { chatId, senderId, senderRole,recipientId,recipientRole, message } = req.body;
-    
-    //     try {
-    //       const newMessage = await this.messageService.createMessage(chatId, senderId, senderRole,recipientId,recipientRole,message);
-    //       res.status(201).json(newMessage);
-    //     } catch (error: any) {
-    //       res.status(500).json({ error: error.message });
-    //     }
-    //   }
+    constructor(messageService:MessageService,chatService:ChatService){
+        this.messageService=messageService;
+
+        this.chatService=chatService;
+    }
 
 
       async createMessage(req: Request, res: Response): Promise<void> {
@@ -48,6 +42,8 @@ class MessageController{
     
         try {
           await this.messageService.markMessagesAsRead(chatId, participantId);
+          const timestamp = new Date().toISOString();
+        // await this.chatService.updateLastMessage(chatId,"",new Date(timestamp),0)
           res.status(200).json({ success: true });
         } catch (error: any) {
           res.status(500).json({ error: error.message });

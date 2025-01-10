@@ -16,6 +16,9 @@ router.post('/',(req,res)=>adminController.postLogin(req,res))
 
 router.post('/refresh-token',(req,res)=>adminController.refreshToken(req,res))
 
+router.post('/logout', (req, res) => adminController.logoutAdmin(req, res));
+
+
 
 
 router.get('/users',adminAuthentcationMiddleware,(req,res)=>adminController.getAllUser(req,res))

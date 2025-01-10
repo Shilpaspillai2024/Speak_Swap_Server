@@ -21,11 +21,15 @@ interface IChat extends Document{
      };
      isActive:boolean;
      lastActivity:Date;
-     unreadCount?:{
-        userId:ObjectId;
-        count:number;
-     }[];
+    //  unreadCount?:{
+    //     userId:ObjectId;
+    //     count:number;
+    //  }[];
+   
+
+    unreadCount:number,
      createdAt:Date;
+
      updatedAt:Date;
 }
 
@@ -67,16 +71,23 @@ const chatSchema =new Schema<IChat>({
         type:Date,
         default:Date.now
     },
-    unreadCount:[{
-        userId:{
-            type:Schema.Types.ObjectId,
-            required:true
-        },
-        count:{
-            type:Number,
-            default:0
-        }
-    }]
+
+    unreadCount:{
+        type:Number,
+        default:0
+    }
+    // unreadCount:[{
+    //     userId:{
+    //         type:Schema.Types.ObjectId,
+    //         required:true
+    //     },
+    //     count:{
+    //         type:Number,
+    //         default:0
+    //     }
+    // }]
+
+    
 
 },
 {timestamps:true});

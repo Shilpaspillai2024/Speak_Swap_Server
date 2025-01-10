@@ -155,9 +155,6 @@ class TutorController {
     }
   }
 
-
-
-
   // tutor login
 
   async tutorLogin(req: Request, res: Response): Promise<void> {
@@ -168,7 +165,6 @@ class TutorController {
         email,
         password
       );
-     
 
       if (!tutor) {
         if (message === "No tutor is registered with this email") {
@@ -177,34 +173,33 @@ class TutorController {
         }
 
         if (message === "Invalid password") {
-          res.status(401).json({ message});
+          res.status(401).json({ message });
           return;
-      
         }
-       if(message === "Your account is blocked"){
-        res.status(403).json({ message });
-        return;
-       }
- 
+        if (message === "Your account is blocked") {
+          res.status(403).json({ message });
+          return;
+        }
 
-       if (message === "Your account is currently inactive. It will be activated within 48 hours." || 
-        message === "Your account has been rejected. Please contact support for assistance.") {
-      res.status(403).json({ message });
-      return;
-    }
-       
+        if (
+          message ===
+            "Your account is currently inactive. It will be activated within 48 hours." ||
+          message ===
+            "Your account has been rejected. Please contact support for assistance."
+        ) {
+          res.status(403).json({ message });
+          return;
+        }
       }
 
-      const role="tutor"
-
-      const payload = { tutorId: tutor!._id,role};
+      const payload = { tutorId: tutor!._id, role: tutor!.role };
       const accessToken = JwtUtils.generateAccessToken(payload);
       const refreshToken = JwtUtils.generateRefreshToken(payload);
 
       res.cookie("tutorRefreshToken", refreshToken, {
         httpOnly: true,
-        secure:process.env.NODE_ENV ==='production',
-        sameSite:process.env.NODE_ENV ==='production'?'none':'lax',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 1 * 60 * 60 * 1000, // 1hr
       });
 
@@ -212,7 +207,6 @@ class TutorController {
         message: "Welcome to the tutors Dashboard",
         accessToken,
         tutor,
-        role,
       });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
@@ -223,46 +217,38 @@ class TutorController {
     }
   }
 
+  //tutor refresh token
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const refreshToken = req.cookies.tutorRefreshToken;
 
-//tutor refresh token
-async refreshToken(req:Request,res:Response):Promise<void>{
-  try {
-
-     
-      const refreshToken =req.cookies.tutorRefreshToken;
-      
-      if(!refreshToken){
-          res.status(401).json({message:"Refresh token missing"});
-          return;
+      if (!refreshToken) {
+        res.status(401).json({ message: "Refresh token missing" });
+        return;
       }
 
-      const decoded =JwtUtils.verifyToken(refreshToken,true);
-    
+      const decoded = JwtUtils.verifyToken(refreshToken, true);
 
-    
-      if(!decoded){
-          res.status(401).json({message:"Invalid Refresh token"});
-          return;
-
+      if (!decoded) {
+        res.status(401).json({ message: "Invalid Refresh token" });
+        return;
       }
-      
-      const payload={tutorId:(decoded as {tutorId:string}).tutorId}
 
-      const newAccessToken=JwtUtils.generateAccessToken(payload)
-     
-      console.log("new AccessToken refreshed:",newAccessToken)
-  
-      res.status(200).json({accessToken:newAccessToken})
-  } catch (error) {
-      console.error("Error in token refresh:",error);
-      res.status(500).json({message:"An unexpected error occured"})
+      const payload = {
+        tutorId: (decoded as { tutorId: string }).tutorId,
+        role: (decoded as { role: string }).role,
+      };
 
+      const newAccessToken = JwtUtils.generateAccessToken(payload);
 
-      
+      console.log("new AccessToken refreshed:", newAccessToken);
+
+      res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+      console.error("Error in token refresh:", error);
+      res.status(500).json({ message: "An unexpected error occured" });
+    }
   }
-}
-
-
 
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
@@ -307,7 +293,7 @@ async refreshToken(req:Request,res:Response):Promise<void>{
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email, newPassword, confirmPassword } = req.body;
-   
+
       if (!email) {
         res.status(400).json({ error: "Email is required" });
         return;
@@ -329,37 +315,30 @@ async refreshToken(req:Request,res:Response):Promise<void>{
     }
   }
 
-
-
   //get tutor
 
-  async getTutor(req:CustomRequest,res:Response):Promise<void>{
-      try {
-  
-        const tutorId=req.user
+  async getTutor(req: CustomRequest, res: Response): Promise<void> {
+    try {
+      const tutorId = req.user;
 
-        console.log("tutorId",tutorId)
-        if (!tutorId) {
-          res.status(400).json({ message: "tutor ID is required" });
-          return;
-        }
-    
-        const tutor = await this.tutorService.getTutor(tutorId)
-      console.log("tutor",tutor)
-        if (!tutor) {
-          res.status(404).json({ message: "Tutor not found." });
-          return;
-        }
-    
-        res.status(200).json(tutor);
-        
-      } catch (error) {
-        res.status(500).json({ message: "Internal server error." });
+      console.log("tutorId", tutorId);
+      if (!tutorId) {
+        res.status(400).json({ message: "tutor ID is required" });
+        return;
       }
+
+      const tutor = await this.tutorService.getTutor(tutorId);
+      console.log("tutor", tutor);
+      if (!tutor) {
+        res.status(404).json({ message: "Tutor not found." });
+        return;
+      }
+
+      res.status(200).json(tutor);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error." });
     }
-
-  
-
+  }
 }
 
 export default TutorController;

@@ -5,7 +5,6 @@ import UserRepositoryImplementation from "../../repositories/implementation/user
 import GeoController from "../../controllers/user/geoController";
 import GeoService from "../../services/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
-// import authenticationMiddleware from "../../middlewares/authenticationMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
 const router=Router()
 

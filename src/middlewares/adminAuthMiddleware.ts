@@ -3,6 +3,7 @@ import JwtUtils  from "../utils/jwtUtils";
 
 export interface CustomRequest extends Request{
     admin?:string;
+    role?:string;
 }
 
 
@@ -19,15 +20,26 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         }
         
         const decoded=JwtUtils.verifyToken(token)
+
+        console.log("Backend Decoded Token Payload:", decoded);
         if(!decoded){
         res.status(401).json({message:"Authentication failed .Invalid token",
-                deatils:"Token verification failed"
+                details:"Token verification failed"
             })
             return
         }
 
-        if (typeof decoded === 'object' && 'email' in decoded) {
+        if (typeof decoded === 'object' && 'email' in decoded && 'role' in decoded) {
             req.admin = (decoded as { email: string }).email;
+            req.role=(decoded as {role:string}).role;
+
+            if (req.role !== 'admin') {
+                res.status(403).json({
+                  message: "Access denied",
+                  details: "You do not have the required permissions",
+                });
+                return;
+              }
             next();
           } else {
              res.status(401).json({

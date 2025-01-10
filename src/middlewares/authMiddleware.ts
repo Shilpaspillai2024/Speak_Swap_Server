@@ -2,55 +2,68 @@ import { Request, Response, NextFunction } from "express";
 import JwtUtils from "../utils/jwtUtils";
 
 export interface CustomRequest extends Request {
- user?:string;
- 
- role?:"user" | "tutor";
-  
+  user?: string;
+  role?: string;
 }
 
-const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const authMiddleware = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '').trim();
-   
+    const token = req.header("Authorization")?.replace("Bearer ", "").trim();
+
     if (!token) {
-      throw new Error('Authentication failed. Token missing.');
+      throw new Error("Authentication failed. Token missing.");
     }
-   
-    const decoded = JwtUtils.verifyToken(token)
-    if (!decoded || typeof decoded !== "object" || (!decoded.userId && !decoded.tutorId)) {
-      res.status(401).json({
+
+    const decoded = JwtUtils.verifyToken(token);
+    if (!decoded) {
+       res.status(401).json({
         message: "Authentication failed. Invalid token.",
-        details: "Token verification failed or invalid token structure.",
+        details: "Token verification failed.",
+      });
+      return;
+    }
+
+    if (
+      typeof decoded === "object" &&
+      ("userId" in decoded || "tutorId" in decoded)
+    ) {
+      if ("userId" in decoded) {
+        req.user = (decoded as { userId: string }).userId;
+        req.role = (decoded as { role: string }).role;
+      } else if ("tutorId" in decoded) {
+        req.user = (decoded as { tutorId: string }).tutorId;
+        req.role = (decoded as { role: string }).role;
+      }
+
+      if (!req.role) {
+         res.status(403).json({
+          message: "Access denied.",
+          details: "Role information missing from the token.",
+        });
+        return
+      }
+
+      next();
+    } else {
+      res.status(401).json({
+        message: "Authentication failed.",
+        details: "Invalid token payload. Missing userId or tutorId.",
       });
       return
     }
-
-
-   if(decoded.userId){
-    req.user=decoded.userId;
-    req.role="user";
-   }else if(decoded.tutorId){
-    req.user=decoded.tutorId;
-    req.role="tutor";
-   }else{
-
-   res.status(401).json({
-        message: "Authentication failed. Missing role information.",
-        details: "Token payload does not contain user or tutor ID.",
-      });
-      return;
-
-   }
-
-    next();
-    
   } catch (error) {
     console.error("Authentication error:", error);
-    res.status(401).json({ message: "Authentication failed.",
-    error: error instanceof Error ? error.message : "Unknown error"
-     });
-    
+    res
+      .status(401)
+      .json({
+        message: "Authentication failed.",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
-}
+};
 
 export default authMiddleware;

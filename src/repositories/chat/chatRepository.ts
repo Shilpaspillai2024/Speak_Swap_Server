@@ -10,6 +10,7 @@ export interface ChatRepository {
   updateLastMessage(
     chatId: string,
     message: string,
-    timestamp: Date
+    timestamp: Date,
+    unreadCount:number,
   ): Promise<void>;
 }

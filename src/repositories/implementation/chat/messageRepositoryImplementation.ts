@@ -3,23 +3,7 @@ import { MessageRepository } from "../../chat/messageRepository";
 
 
 class MessageRepositoryImplementation implements MessageRepository{
-    // async createMessage(chatId: string, senderId: string, senderRole: "user" | "tutor",reciepientId:string,reciepientRole:"user" | "tutor", message: string): Promise<IMessage> {
-    //     try {
 
-    //         const newMessage= new Message({
-    //             chatId,
-    //             senderId,
-    //             senderRole,
-    //             reciepientId,
-    //             reciepientRole,
-    //             message,
-    //         });
-    //         return await newMessage.save();
-            
-    //     } catch (error:any) {
-    //         throw new Error(`Failed to create message: ${error.message}`);
-    //     }
-    // }
 
     async createMessage(chatId: string, senderId: string, senderRole: "user" | "tutor", message: string): Promise<IMessage> {
         try {
