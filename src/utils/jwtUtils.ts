@@ -9,7 +9,7 @@ const refreshSecret=process.env.JWT_REFRESH_TOKEN_SECRET_KEY as string
 
 class JwtUtils{
     static generateAccessToken(paylaod:object):string{
-        return jwt.sign(paylaod,accessSecret,{expiresIn:'1m'})
+        return jwt.sign(paylaod,accessSecret,{expiresIn:'15m'})
     }
 
     static generateRefreshToken(paylaod:object):string{

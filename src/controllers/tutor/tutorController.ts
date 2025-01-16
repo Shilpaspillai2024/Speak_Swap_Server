@@ -3,6 +3,7 @@ import TutorService from "../../services/tutor/tutorService";
 import JwtUtils from "../../utils/jwtUtils";
 // import { CustomRequest } from "../../middlewares/tutorAuthMiddleware";
 import { CustomRequest } from "../../middlewares/authMiddleware";
+import { IAvailability } from "../../types/ITutor";
 
 class TutorController {
   private tutorService: TutorService;
@@ -337,6 +338,102 @@ class TutorController {
       res.status(200).json(tutor);
     } catch (error) {
       res.status(500).json({ message: "Internal server error." });
+    }
+  }
+
+  async setAvailability(req: CustomRequest, res: Response): Promise<void> {
+    const { tutorId } = req.params;
+    console.log("tutorId", tutorId);
+
+    const { schedule, timeZone } = req.body;
+
+    if (!Array.isArray(schedule) || schedule.length === 0) {
+      throw new Error("Invalid schedule format");
+    }
+
+    schedule.forEach((daySchedule) => {
+      if (
+        !daySchedule.day ||
+        !Array.isArray(daySchedule.slots) ||
+        daySchedule.slots.length === 0
+      ) {
+        throw new Error(`Invalid slots for day: ${daySchedule.day}`);
+      }
+    });
+
+    if (!timeZone || typeof timeZone !== "string") {
+      throw new Error("Invalid timezone");
+    }
+
+    console.log("schedule from req.body", schedule);
+    console.log(
+      "Received schedule from frontend:",
+      JSON.stringify(schedule, null, 2)
+    );
+    try {
+      const updatedTutor = await this.tutorService.setAvailability(
+        tutorId,
+        schedule,
+        timeZone
+      );
+      if (!updatedTutor) {
+        res.status(404).json({ message: "Tutor not found" });
+      } else {
+        res.status(200).json({
+          message: "Availability updated successfully",
+          tutor: updatedTutor,
+        });
+      }
+      console.log("Updated tutor availability:", updatedTutor);
+    } catch (error) {
+      res.status(500).json({
+        message: "Failed to update availability",
+        error: (error as Error).message,
+      });
+    }
+  }
+
+  async deleteSlot(req: CustomRequest, res: Response): Promise<void> {
+    const { tutorId, day, slotIndex } = req.params;
+
+    try {
+      const updateTutor = await this.tutorService.deleteSlot(
+        tutorId,
+        day,
+        parseInt(slotIndex)
+      );
+      if (!updateTutor) {
+        res
+          .status(404)
+          .json({ message: "Tutor not found or slot not deleted." });
+      } else {
+        res
+          .status(200)
+          .json({ message: "Slot deleted successfully", tutor: updateTutor });
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json({
+          message: "Failed to delete slot",
+          error: (error as Error).message,
+        });
+    }
+  }
+
+  async getAvailability(req: CustomRequest, res: Response): Promise<void> {
+    const tutorId = req.params.tutorId;
+
+    try {
+      const availability = await this.tutorService.getAvailability(tutorId);
+      if (!availability) {
+        res.status(404).json({ message: "Tutor not found" });
+        return;
+      }
+
+      res.status(200).json(availability);
+    } catch (error) {
+      res.status(500).json({ message: "something went wrong" });
     }
   }
 }

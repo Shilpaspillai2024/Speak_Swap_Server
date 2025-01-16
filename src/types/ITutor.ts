@@ -1,13 +1,13 @@
 import { ObjectId,Document } from "mongoose";
 
 
-interface ITimeSlot {
+export interface ITimeSlot {
     startTime: string;
     endTime: string;
   }
   
   
-  interface IAvailability {
+ export interface IAvailability {
     day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
     slots: ITimeSlot[];
   }
@@ -34,5 +34,6 @@ export interface ITutor extends Document{
     updatedAt:Date;
     status:"pending" | "approved" | "rejected";
     role: "user" | "tutor";
+    timeZone:string;
     availability: IAvailability[];
 }

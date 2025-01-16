@@ -30,8 +30,11 @@ const io=new Server(server,{
     origin: 'http://localhost:3000', // Allow frontend origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-
-  }
+    allowedHeaders: ['Content-Type', 'Authorization']
+  },
+  
+  transports: ['websocket'], 
+  
 })
 
 app.use(json());
@@ -76,7 +79,7 @@ app.get('/',(req,res)=>{
 
 io.on('connection',(socket)=>{
   console.log(`user connected ;${socket.id}`);
-
+  console.log(`Transport used: ${socket.conn.transport.name}`);
 
   // join a chat room
 
@@ -84,7 +87,8 @@ io.on('connection',(socket)=>{
     
     socket.join(chatId);
     console.log(`User ${socket.id} joined chat: ${chatId}`);
-   
+    socket.to(chatId).emit('userJoined', { userId: socket.id });
+
   })
 
 

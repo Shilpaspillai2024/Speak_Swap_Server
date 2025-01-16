@@ -1,112 +1,119 @@
-
-import mongoose, {Schema,model}from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { ITutor } from "../../types/ITutor";
 
-const availabilitySchema=new Schema({
-    day: {
+const availabilitySchema = new Schema({
+  day: {
+    type: String,
+    enum: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    required: true,
+  },
+  slots: [
+    {
+      startTime: {
         type: String,
-        enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         required: true,
       },
-      slots: [
-        {
-          startTime: {
-            type: String,
-            required: true, 
-          },
-          endTime: {
-            type: String,
-            required: true, 
-          },
-        },
-      ],
+      endTime: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
+});
 
-})
-
-const tutorSchema=new Schema<ITutor>({
-    name:{
-        type:String,
-        required:true
+const tutorSchema = new Schema<ITutor>(
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    phone:{
-        type:String,
-        required:true,
-        unique:true,
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    password:{
-        type:String
+    password: {
+      type: String,
     },
     gender: {
-        type: String,
-        enum: ["Male", "Female", "Other"],
-       
+      type: String,
+      enum: ["Male", "Female", "Other"],
     },
     dob: {
-        type: Date,
-        
+      type: Date,
     },
 
-    isActive:{
-        type:Boolean,
-        default:false
+    isActive: {
+      type: Boolean,
+      default: false,
     },
-    country:{
-        type:String,
-       
+    country: {
+      type: String,
     },
-    knownLanguages:{
-        type:[String],
-        
+    knownLanguages: {
+      type: [String],
     },
-     teachLanguage:{
-        type:String,
-       
+    teachLanguage: {
+      type: String,
     },
-    otp:{
-        type:String,
+    otp: {
+      type: String,
     },
-    otpExpiration:{
-        type:Date,
+    otpExpiration: {
+      type: Date,
     },
-    
-    isVerified:{
-        type:Boolean,
-        default:false
-    },
-    profilePhoto:{
-        type:String
-    },
-    certificates:{
-        type:[String]
-    },
-    introductionVideo:{
-        type:String
-    },
-    status:{
-        type:String,
-        enum:["pending","approved","rejected"],
-        default:"pending"
 
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    profilePhoto: {
+      type: String,
+    },
+    certificates: {
+      type: [String],
+    },
+    introductionVideo: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
     role: {
-        type: String,
-        enum: ["user", "tutor"],
-        default: "tutor",
-      },
-    
-      availability: [availabilitySchema]
-   
-},{timestamps:true})
+      type: String,
+      enum: ["user", "tutor"],
+      default: "tutor",
+    },
 
+    timeZone:{
+      type:String,
+      required:true,
+      default:'UTC'
+    },
 
-const Tutor=mongoose.model<ITutor>('Tutor',tutorSchema)
+    availability: {
+      type: [availabilitySchema],
+      default: [],
+    },
+  },
+  { timestamps: true }
+);
 
-export {Tutor}
+const Tutor = mongoose.model<ITutor>("Tutor", tutorSchema);
 
-
-
+export { Tutor };

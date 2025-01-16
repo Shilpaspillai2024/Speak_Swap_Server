@@ -35,5 +35,11 @@ router.post('/refresh-token',(req,res)=>tutorController.refreshToken(req,res))
 router.get('/profile',authMiddleware,(req,res)=>tutorController.getTutor(req,res))
 
 
+router.put('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.setAvailability(req,res))
 
+
+
+router.delete('/:tutorId/availability/:day/:slotIndex',(req,res)=>tutorController.deleteSlot(req,res))
+
+router.get('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.getAvailability(req,res))
 export default router

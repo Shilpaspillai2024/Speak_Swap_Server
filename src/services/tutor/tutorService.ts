@@ -1,4 +1,4 @@
-import { ITutor } from "../../types/ITutor";
+import { ITutor ,IAvailability} from "../../types/ITutor";
 import TutorRepository from "../../repositories/tutor/tutorRepository";
 import EmailUtils from "../../utils/emailUtils";
 import PasswordUtils from "../../utils/passwordUtils";
@@ -301,6 +301,35 @@ class TutorService {
 
   async getTutor(id:string):Promise<ITutor | null>{
     return await this.tutorRepository.findTutorById(id)
+  }
+
+
+  async setAvailability(id:string,schedule:IAvailability[],timeZone:string):Promise<ITutor | null>{
+      const updateTutor=await this.tutorRepository.setAvailability(id,schedule,timeZone)
+
+      if(!updateTutor){
+        throw new Error("Tutor not found or availability update failed.");
+      }
+      return updateTutor
+  }
+
+
+  async deleteSlot(id: string, day: string, slotIndex: number): Promise<ITutor | null> {
+  
+
+    const updateTutor=await this.tutorRepository.deleteSlot(id,day,slotIndex)
+  
+
+    if (!updateTutor) {
+      throw new Error('Failed to delete slot or tutor not found.');
+    }
+    return updateTutor;
+  }
+
+
+  async getAvailability(id:string):Promise<IAvailability[] | null> {
+
+    return await this.tutorRepository.getAvailability(id)
   }
 
 }
