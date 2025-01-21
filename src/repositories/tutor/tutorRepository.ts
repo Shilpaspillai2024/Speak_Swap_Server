@@ -9,5 +9,6 @@ interface TutorRepository{
     setAvailability(id:string,availability:IAvailability[],timeZone:string):Promise<ITutor | null>
     deleteSlot(id:string,day:string,slotIndex:number):Promise<ITutor | null>;
     getAvailability(id:string):Promise<IAvailability[] | null>
+    getAllTutors():Promise<ITutor[]>
 }
 export default TutorRepository

@@ -9,6 +9,7 @@ import userRoute from './routes/user/userRoute'
 import tutorRoute from './routes/tutor/tutorRoute'
 import chatRoute from './routes/chat/chatRoute'
 import messageRoute from './routes/chat/messageRoute'
+import bookingRoute from './routes/booking/bookingRoute'
 import cookieParser from 'cookie-parser'
 import { Server } from 'socket.io';
 
@@ -67,6 +68,8 @@ app.use('/tutor',tutorRoute)
 
 app.use('/chat',chatRoute)
 app.use('/message',messageRoute)
+
+app.use('/booking',bookingRoute)
 
 app.get('/',(req,res)=>{
     res.send("welcome to speak swap")

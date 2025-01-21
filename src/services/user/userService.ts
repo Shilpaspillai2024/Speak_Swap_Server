@@ -5,14 +5,23 @@ import PasswordUtils from "../../utils/passwordUtils";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cloudinary from "../../config/cloudinaryConfig";
+import TutorRepository from "../../repositories/tutor/tutorRepository";
+import { Tutor } from "../../models/tutor/tutorModel";
+import { ITutor } from "../../types/ITutor";
 
 dotenv.config();
 
 class UserService {
   private userRepository: UserRepository;
+  private tutorRepository: TutorRepository;
 
-  constructor(userRepository: UserRepository) {
+  constructor(
+    userRepository: UserRepository,
+    tutorRepository: TutorRepository
+  ) {
     this.userRepository = userRepository;
+
+    this.tutorRepository = tutorRepository;
   }
 
   // Generate jwt
@@ -183,17 +192,15 @@ class UserService {
     email: string,
     password: string
   ): Promise<{ user: IUser | null; message: string }> {
-
-
     const user = await this.userRepository.findUserByEmail(email);
 
     if (!user) {
-      console.log('No user found with email');
+      console.log("No user found with email");
       return { user: null, message: "No user is registered with this email" };
     }
 
     if (!user.isActive) {
-      console.log('User account is blocked');
+      console.log("User account is blocked");
       return { user: null, message: "Your account is blocked" };
     }
 
@@ -207,8 +214,6 @@ class UserService {
 
     return { user: user, message: " User is Authenticated" };
   }
-
-  
 
   //user forgot password
 
@@ -273,35 +278,47 @@ class UserService {
     return user;
   }
 
-
-
-  async getAllUsers():Promise<IUser[]>{
+  async getAllUsers(): Promise<IUser[]> {
     return await this.userRepository.getAllUsers();
   }
 
-  async deleteuser(id:string):Promise<IUser | null>{
-    return await this.userRepository.deleteUser(id)
+  async deleteuser(id: string): Promise<IUser | null> {
+    return await this.userRepository.deleteUser(id);
   }
 
-  async getUser(id:string):Promise<IUser | null>{
-    return await this.userRepository.findUserById(id)
+  async getUser(id: string): Promise<IUser | null> {
+    return await this.userRepository.findUserById(id);
   }
 
-  async getLoggedUser(id:string):Promise<IUser | null>{
-    return await this.userRepository.findUserById(id)
+  async getLoggedUser(id: string): Promise<IUser | null> {
+    return await this.userRepository.findUserById(id);
   }
 
-
-  async updateUser(id:string,updateData:Partial<IUser>):Promise<IUser | null>{
-    if(!id){
-      throw new Error("User id is required")
+  async updateUser(
+    id: string,
+    updateData: Partial<IUser>
+  ): Promise<IUser | null> {
+    if (!id) {
+      throw new Error("User id is required");
     }
 
     if (!updateData || Object.keys(updateData).length === 0) {
-      throw new Error('No data provided for update');
+      throw new Error("No data provided for update");
     }
 
-    return await this.userRepository.updateUser(id,updateData)
+    return await this.userRepository.updateUser(id, updateData);
+  }
+
+  // get All tutors for listing  user side
+
+  async listTutorsForUser(): Promise<ITutor[]> {
+    return await this.tutorRepository.getAllTutors();
+  }
+
+  // get each tutor for profile listing
+
+  async tutorProfile(tutorId: string): Promise<ITutor | null> {
+    return await this.tutorRepository.findTutorById(tutorId);
   }
 }
 

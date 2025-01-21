@@ -473,6 +473,54 @@ class UserController {
       res.status(500).json({ success: false, message: error.message || 'An error occurred' });
     }
   }
+
+
+
+
+  // get All tutors in user side
+
+   async listTutorsForUser(req:CustomRequest,res:Response):Promise<void>{
+      
+    try {
+      const tutors=await this.userService.listTutorsForUser();
+
+      console.log("fetched tutors:",tutors)
+      res.status(200).json(tutors)
+      
+    } catch (error:any) {
+ 
+      console.error('Error fetching tutors:', error); 
+      res.status(500).json({ message: 'Failed to fetch tutors', error: error.message });
+    }
+    }
+
+
+    // get tutor profile
+     async tutorProfile(req:CustomRequest,res:Response): Promise<void> {
+      try {
+
+        const {tutorId}=req.params;
+
+      if(!tutorId){
+        res.status(400).json({message:"tutor id is required"})
+        return;
+      }
+
+      const tutor=await this.userService.tutorProfile(tutorId)
+
+      if (!tutor) {
+        res.status(404).json({ message: "tutor not found." });
+        return;
+      }
+      res.status(200).json(tutor);
+        
+        
+      } catch (error:any) {
+        console.error('Error fetching tutor:', error); 
+        res.status(500).json({ message: 'Failed to fetch tutor', error: error.message });
+      }
+      }
+
 }
 
 export default UserController;

@@ -110,6 +110,11 @@ const tutorSchema = new Schema<ITutor>(
       type: [availabilitySchema],
       default: [],
     },
+
+    hourlyRate:{
+      type:Number,
+      default:10  // Fixed $10/hour base rate
+    }
   },
   { timestamps: true }
 );

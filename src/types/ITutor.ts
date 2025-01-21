@@ -36,4 +36,5 @@ export interface ITutor extends Document{
     role: "user" | "tutor";
     timeZone:string;
     availability: IAvailability[];
+    hourlyRate:number;
 }

@@ -6,10 +6,13 @@ import GeoController from "../../controllers/user/geoController";
 import GeoService from "../../services/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
+import TutorRepositoryImplemenation from "../../repositories/implementation/tutor/tutorRepositoryImplementation";
 const router=Router()
 
 const userRepository =new UserRepositoryImplementation();
-const userService=new UserService(userRepository)
+
+const tutorRepository=new TutorRepositoryImplemenation();
+const userService=new UserService(userRepository,tutorRepository)
 const userController=new UserController(userService)
 const geoService=new GeoService()
 const geoController=new GeoController(geoService)
@@ -49,4 +52,10 @@ router.get("/user/:id",authMiddleware,(req,res)=>userController.getUser(req,res)
 router.get("/profile",authMiddleware,(req,res)=>userController.getLoggedUser(req,res))
 
 router.put('/update',authMiddleware,(req,res)=>userController.updateUser(req,res))
+
+
+router.get("/tutors",authMiddleware,(req,res)=>userController.listTutorsForUser(req,res))
+
+router.get("/tutors/:tutorId",authMiddleware,(req,res)=>userController.tutorProfile(req,res))
+
 export default router;

@@ -61,15 +61,16 @@ class TutorRepositoryImplemenation implements TutorRepository {
     return tutor.save();
   }
 
-
- async getAvailability(id: string): Promise<IAvailability[] | null> {
-
+  async getAvailability(id: string): Promise<IAvailability[] | null> {
     const tutor = await Tutor.findById(id).select("availability");
     if (!tutor) {
       throw new Error("Tutor not found.");
     }
     return tutor.availability;
-     
- }
+  }
+
+  async getAllTutors(): Promise<ITutor[]> {
+    return await Tutor.find();
+  }
 }
 export default TutorRepositoryImplemenation;
