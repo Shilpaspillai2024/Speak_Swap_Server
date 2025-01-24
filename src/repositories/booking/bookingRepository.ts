@@ -6,4 +6,9 @@ export interface BookingRepository{
     updateBookingPaymentStatus(bookingId: string, paymentStatus: string): Promise<IBooking | null>;
     getBookingById(bookingId:string):Promise<IBooking | null>;
     getBookedSlots(tutorId: string, selectedDay: string): Promise<{ startTime: string; endTime: string }[]>;
+    getBooking(userId:string):Promise<IBooking[] >
+    getTutorBookings(tutorId:string):Promise<IBooking[]>
+
+  
+
 }

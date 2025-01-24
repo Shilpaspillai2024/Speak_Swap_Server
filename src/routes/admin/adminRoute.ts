@@ -3,11 +3,14 @@ import AdminController from "../../controllers/admin/adminController";
 import AdminService from "../../services/admin/adminService";
 import AdminRepositoryImplemenation from "../../repositories/implementation/admin/adminRepositoryImplementation";
 import adminAuthentcationMiddleware from "../../middlewares/adminAuthMiddleware";
+import AdminBookingController from "../../controllers/admin/adminBookingController";
+
 
 const adminRepositoryImplementation=new AdminRepositoryImplemenation();
-const adminService=new AdminService(adminRepositoryImplementation)
-const adminController=new AdminController(adminService)
+const adminService=new AdminService(adminRepositoryImplementation);
+const adminController=new AdminController(adminService);
 
+const adminBookingController=new AdminBookingController(adminService);
 
 const router=Router()
 
@@ -32,5 +35,11 @@ router.get('/tutors/pending-tutors',adminAuthentcationMiddleware,(req,res)=>admi
 router.patch('/tutors/verify/:tutorId/status',adminAuthentcationMiddleware,(req,res)=>adminController.tutorVerify(req,res))
 
 router.patch('/tutors/:tutorId',adminAuthentcationMiddleware,(req,res)=>adminController.blockUnblockTutor(req,res))
+
+
+
+router.get('/bookings',adminAuthentcationMiddleware,(req,res)=>adminBookingController.getAllBookings(req,res));
+
+router.get('/bookings/:bookingId',adminAuthentcationMiddleware,(req,res)=>adminBookingController.getBookingDetails(req,res));
 
 export default router;

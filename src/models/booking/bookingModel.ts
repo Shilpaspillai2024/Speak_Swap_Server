@@ -7,7 +7,7 @@ export interface IBooking extends Document{
     selectedSlot:{startTime:string,endTime:string};
     status:'pending' |'confirmed'|'completed'|'cancelled';
     sessionFee:number;
-    paymentStatus:'paid'| 'pending' | 'failed';
+    paymentStatus:'paid'| 'pending' | 'failed'|'completed';
     bookingDate:Date;
     paymentId?:string;
     orderId?: string;
@@ -44,7 +44,7 @@ const bookingSchema=new Schema<IBooking>({
     },
   paymentStatus: { 
     type: String, 
-    enum: ['paid', 'pending', 'failed'], 
+    enum: ['paid', 'pending', 'failed','completed'], 
     default: 'pending'
  },
   bookingDate: { 

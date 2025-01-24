@@ -2,6 +2,7 @@ import { IAdmin } from "../../models/admin/adminModel";
 import AdminRepository from "../../repositories/admin/adminRepository";
 import { IUser } from "../../models/user/userModel";
 import { ITutor } from "../../types/ITutor";
+import { IBooking } from "../../models/booking/bookingModel";
 
 
 class AdminService{
@@ -49,6 +50,26 @@ class AdminService{
     async updateTutorStatus(tutorId:string,isActive:boolean):Promise<ITutor | null>{
         return await this.adminRepository.updateTutorStatus(tutorId,isActive);
     }
+
+    async getAllBookings():Promise<IBooking[]>{
+        try {
+            const bookings = await this.adminRepository.getAllBookings();
+             return bookings;
+        } catch (error) {
+            throw new Error("Failed to fetch all bookings");
+        }
+        
+    }
+
+   async getBookingDetails(bookingId:string):Promise<IBooking | null>{
+    try {
+        const booking=await this.adminRepository.getBookingById(bookingId);
+        return booking;
+    } catch (error) {
+        throw new Error("Failed to fetch booking details");
+    }
+   }
+    
 }
 
 

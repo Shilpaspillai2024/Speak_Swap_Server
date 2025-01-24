@@ -21,9 +21,11 @@ const razorpay = new Razorpay({
 
 class BookingController {
   private bookingService: BookingService;
+  
 
   constructor(bookingService: BookingService) {
     this.bookingService = bookingService;
+   
   }
 
   async createBooking(req: CustomRequest, res: Response): Promise<void> {
@@ -102,14 +104,18 @@ class BookingController {
     }
   }
 
+
   async verifyPayment(req: CustomRequest, res: Response): Promise<void> {
-    const { paymentId, orderId, signature, bookingId } = req.body;
+    const { paymentId, orderId, signature, bookingId, tutorId,amount,creditedBy } = req.body;
 
     console.log("Received Payment Details:", {
       paymentId,
       orderId,
       signature,
       bookingId,
+      tutorId,
+      amount,
+      creditedBy,
     });
     const generatedSignature = crypto
       .createHmac("sha256", keySecret!)
@@ -117,14 +123,11 @@ class BookingController {
       .digest("hex");
 
     if (generatedSignature === signature) {
-      const updatedBooking = await this.bookingService.updatePaymentStatus(
-        bookingId,
-        "paid"
-      );
+      const updatedBooking = await this.bookingService.verifyAndCreditWallet(bookingId, tutorId, "paid", amount,creditedBy);
 
       res.status(200).json({
         success: true,
-        message: "Payment verified successfully",
+        message: "Payment verified and wallet credited successfully",
         booking: updatedBooking,
       });
     } else {
@@ -174,6 +177,63 @@ class BookingController {
         .json({ success: false, message: "Error fetching booked slots" });
     }
   }
+
+
+  async getUserBookings(req:CustomRequest, res:Response):Promise<void>{
+    try {
+
+
+      const userId=req.user;
+
+
+      console.log("userId",userId)
+      if (!userId ) {
+        res.status(400).json({ success: false, message: 'Invalid or missing user ID' });
+        return;
+      }
+      const result=await this.bookingService.getUserBookings(userId)
+     console.log("result of booings",result)
+     
+      res.status(200).json({ success: true,result});
+      
+    } catch (error) {
+      console.error("Error fetching user bookings:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "internal server error" });
+    }
+  }
+
+
+
+  async getTutorBookings(req:CustomRequest, res:Response):Promise<void>{
+    try {
+
+
+      const tutorId=req.user;
+
+
+      console.log("tutorId",tutorId)
+      if (!tutorId ) {
+        res.status(400).json({ success: false, message: 'Invalid or missing tutor ID' });
+        return;
+      }
+      const result=await this.bookingService.getTutorBookings(tutorId)
+     console.log("result of booings",result)
+     
+      res.status(200).json({ success: true,result});
+      
+    } catch (error) {
+      console.error("Error fetching user bookings:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "internal server error" });
+    }
+  }
+
+
+ 
+
 }
 
 export default BookingController;

@@ -5,11 +5,22 @@ import TutorRepositoryImplemenation from "../../repositories/implementation/tuto
 import tutorUpload from "../../middlewares/tutorUploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
 
+import WalletService from "../../services/wallet/walletService";
+import WalletRepositoryImplementation from "../../repositories/implementation/wallet/walletRepositoryImplementation";
+import WalletController from "../../controllers/wallet/walletController";
+
+
 const router=Router()
 
 const tutorRepository=new TutorRepositoryImplemenation()
 const tutorService=new TutorService(tutorRepository)
 const tutorController=new TutorController(tutorService)
+
+
+const walletRepository = new WalletRepositoryImplementation();
+const walletService = new WalletService(walletRepository);
+const walletController = new WalletController(walletService);
+
 
 
 router.post("/signup",(req,res)=>tutorController.tutorBasicDetails(req,res))
@@ -42,4 +53,9 @@ router.put('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.se
 router.delete('/:tutorId/availability/:day/:slotIndex',(req,res)=>tutorController.deleteSlot(req,res))
 
 router.get('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.getAvailability(req,res))
+
+
+router.get('/wallet-details', authMiddleware, (req, res) => 
+    walletController.getWalletDetails(req, res)
+  );
 export default router
