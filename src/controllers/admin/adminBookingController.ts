@@ -1,12 +1,12 @@
 import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
-import AdminService from "../../services/admin/adminService";
+import IAdminService from "../../services/implementation/admin/adminService";
 import { Response } from "express";
 
 class AdminBookingController{
 
-    private adminService:AdminService;
+    private adminService:IAdminService;
 
-    constructor(adminService:AdminService){
+    constructor(adminService:IAdminService){
         this.adminService=adminService;
     }
 

@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
-import TutorService from "../../services/tutor/tutorService";
 import JwtUtils from "../../utils/jwtUtils";
-// import { CustomRequest } from "../../middlewares/tutorAuthMiddleware";
 import { CustomRequest } from "../../middlewares/authMiddleware";
-import { IAvailability } from "../../types/ITutor";
+import ITutorService from "../../services/interfaces/tutor/itutorService";
 
 class TutorController {
-  private tutorService: TutorService;
+  private tutorService: ITutorService;
 
-  constructor(tutorService: TutorService) {
+  constructor(tutorService: ITutorService) {
     this.tutorService = tutorService;
   }
 

@@ -1,11 +1,10 @@
-import BookingService from "../../services/booking/bookingService";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { CustomRequest } from "../../middlewares/authMiddleware";
-import { IBooking } from "../../models/booking/bookingModel";
 import Booking from "../../models/booking/bookingModel";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import mongoose from "mongoose";
+import IBookingService from "../../services/interfaces/booking/ibookingService";
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -20,10 +19,10 @@ const razorpay = new Razorpay({
 });
 
 class BookingController {
-  private bookingService: BookingService;
+  private bookingService: IBookingService;
   
 
-  constructor(bookingService: BookingService) {
+  constructor(bookingService: IBookingService) {
     this.bookingService = bookingService;
    
   }

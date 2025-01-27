@@ -1,23 +1,23 @@
 import { Router } from "express";
 import TutorController from "../../controllers/tutor/tutorController";
-import TutorService from "../../services/tutor/tutorService";
-import TutorRepositoryImplemenation from "../../repositories/implementation/tutor/tutorRepositoryImplementation";
+import TutorService from "../../services/implementation/tutor/tutorService";
+import TutorRepository from "../../repositories/implementation/tutor/tutorRepository";
 import tutorUpload from "../../middlewares/tutorUploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
 
-import WalletService from "../../services/wallet/walletService";
-import WalletRepositoryImplementation from "../../repositories/implementation/wallet/walletRepositoryImplementation";
+import WalletService from "../../services/implementation/wallet/walletService";
+import WalletRepository from "../../repositories/implementation/wallet/walletRepository";
 import WalletController from "../../controllers/wallet/walletController";
 
 
 const router=Router()
 
-const tutorRepository=new TutorRepositoryImplemenation()
+const tutorRepository=new TutorRepository()
 const tutorService=new TutorService(tutorRepository)
 const tutorController=new TutorController(tutorService)
 
 
-const walletRepository = new WalletRepositoryImplementation();
+const walletRepository = new WalletRepository();
 const walletService = new WalletService(walletRepository);
 const walletController = new WalletController(walletService);
 

@@ -1,12 +1,12 @@
-import AdminService from "../../services/admin/adminService";
 import { Request, Response } from "express";
 import JwtUtils from "../../utils/jwtUtils";
 import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
+import IAdminService from "../../services/interfaces/admin/iadminService";
 
 class AdminController {
-  private adminService: AdminService;
+  private adminService: IAdminService;
 
-  constructor(adminService: AdminService) {
+  constructor(adminService: IAdminService) {
     this.adminService = adminService;
   }
 

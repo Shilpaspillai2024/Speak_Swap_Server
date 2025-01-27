@@ -1,11 +1,11 @@
 import { Request,Response } from "express";
-import GeoService from "../../services/user/geoService";
+import IGeoService from "../../services/interfaces/user/igeoService";
 
 class GeoController{
-    private geoService:GeoService;
+    private geoService:IGeoService;
 
 
-    constructor(geoService:GeoService){
+    constructor(geoService:IGeoService){
         this.geoService=geoService;
     }
 

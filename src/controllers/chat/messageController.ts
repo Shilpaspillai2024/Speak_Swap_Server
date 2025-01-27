@@ -1,14 +1,14 @@
 import { Request,Response } from "express";
-import MessageService from "../../services/chat/messageService";
-import ChatService from "../../services/chat/chatService";
+import IChatService from "../../services/interfaces/chat/ichatService";
+import IMessageService from "../../services/interfaces/chat/imessageService";
 
 class MessageController{
-    private messageService:MessageService;
+    private messageService:IMessageService;
 
 
-    private chatService:ChatService;
+    private chatService:IChatService;
 
-    constructor(messageService:MessageService,chatService:ChatService){
+    constructor(messageService:IMessageService,chatService:IChatService){
         this.messageService=messageService;
 
         this.chatService=chatService;

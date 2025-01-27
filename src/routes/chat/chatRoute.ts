@@ -1,12 +1,12 @@
 import { Router } from "express";
 import ChatController from "../../controllers/chat/chatController";
-import ChatRepositoryImplementation from "../../repositories/implementation/chat/chatRepositoryImplementation";
-import ChatService from "../../services/chat/chatService";
+import ChatRepository from "../../repositories/implementation/chat/chatRepository";
+import ChatService from "../../services/implementation/chat/chatService";
 import authMiddleware from "../../middlewares/authMiddleware";
 
 const router=Router()
 
-const chatRepository =new ChatRepositoryImplementation();
+const chatRepository =new ChatRepository();
 const chatService=new ChatService(chatRepository)
 const chatController=new ChatController(chatService)
 

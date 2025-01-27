@@ -1,17 +1,17 @@
 import { Router } from "express";
 import UserController from "../../controllers/user/userController";
-import UserService from "../../services/user/userService";
-import UserRepositoryImplementation from "../../repositories/implementation/user/userRepositoryImplementation";
+import UserService from "../../services/implementation/user/userService";
+import UserRepository from "../../repositories/implementation/user/userRepository";
 import GeoController from "../../controllers/user/geoController";
-import GeoService from "../../services/user/geoService";
+import GeoService from "../../services/implementation/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
-import TutorRepositoryImplemenation from "../../repositories/implementation/tutor/tutorRepositoryImplementation";
+import TutorRepository from "../../repositories/implementation/tutor/tutorRepository";
 const router=Router()
 
-const userRepository =new UserRepositoryImplementation();
+const userRepository =new UserRepository();
 
-const tutorRepository=new TutorRepositoryImplemenation();
+const tutorRepository=new TutorRepository();
 const userService=new UserService(userRepository,tutorRepository)
 const userController=new UserController(userService)
 const geoService=new GeoService()

@@ -1,16 +1,16 @@
 import { Router } from "express";
 import BookingController from "../../controllers/booking/bookingController";
-import BookingRepositoryImplementation from "../../repositories/implementation/booking/bookingRepositoryImplentation";
-import BookingService from "../../services/booking/bookingService";
+import BookingRepository from "../../repositories/implementation/booking/bookingRepository";
+import BookingService from "../../services/implementation/booking/bookingService";
 import authMiddleware from "../../middlewares/authMiddleware";
-import WalletService from "../../services/wallet/walletService";
-import WalletRepositoryImplementation from "../../repositories/implementation/wallet/walletRepositoryImplementation";
+import WalletService from "../../services/implementation/wallet/walletService";
+import WalletRepository from "../../repositories/implementation/wallet/walletRepository";
 
 const router=Router();
 
-const bookingRepository =new BookingRepositoryImplementation();
+const bookingRepository =new BookingRepository();
 
-const walletRepository = new WalletRepositoryImplementation();
+const walletRepository = new WalletRepository();
 
 
 const walletService = new WalletService(walletRepository);

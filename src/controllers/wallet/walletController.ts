@@ -1,12 +1,12 @@
-import WalletService from "../../services/wallet/walletService";
 import { CustomRequest } from "../../middlewares/authMiddleware";
 import { Response } from "express";
 import { IWallet } from "../../models/tutor/walletModel";
+import IWalletService from "../../services/interfaces/wallet/iwalletService";
 
 class WalletController {
-  private walletService: WalletService;
+  private walletService: IWalletService;
 
-  constructor(walletSerivce: WalletService) {
+  constructor(walletSerivce: IWalletService) {
     this.walletService = walletSerivce;
   }
 

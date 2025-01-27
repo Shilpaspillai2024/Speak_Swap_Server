@@ -1,13 +1,12 @@
 import { Request,Response } from "express";
-import ChatService from "../../services/chat/chatService";
-import { Chat } from "../../models/chat/chatModel";
+import IChatService from "../../services/interfaces/chat/ichatService";
 
 
 class ChatController{
-    private chatService:ChatService;
+    private chatService:IChatService;
      
 
-    constructor(chatService:ChatService){
+    constructor(chatService:IChatService){
         this.chatService=chatService
     }
 

@@ -113,6 +113,52 @@ io.on('connection',(socket)=>{
     callback({ success: true, message: 'Message sent successfully.' });
   });
 
+
+
+
+  //webrtc video call events
+
+  socket.on('videoCallRequest', ({ chatId, senderId, recipientId }) => {
+    console.log(`Call request from ${senderId} to ${recipientId} in room ${chatId}`);
+    socket.to(chatId).emit('videoCallRequest', { senderId});
+  });
+
+  
+
+
+  socket.on('videoCallAccepted', (data) => {
+   
+    socket.to(data.chatId).emit('callAccepted', data);
+  });
+
+  socket.on('videoCallRejected', (data) => {
+   
+    socket.to(data.chatId).emit('callRejected', data);
+  });
+
+
+  socket.on('offer', ({ chatId, offer }) => {
+    console.log(`WebRTC Offer sent to room: ${chatId}`);
+    socket.to(chatId).emit('offer', { offer });
+  });
+
+  socket.on('answer', ({ chatId, answer }) => {
+    console.log(`WebRTC Answer sent to room: ${chatId}`);
+    socket.to(chatId).emit('answer', { answer });
+  });
+
+
+  socket.on('ice-candidate', ({ chatId, candidate }) => {
+    console.log(`ICE candidate sent to room: ${chatId}`);
+    socket.to(chatId).emit('ice-candidate', { candidate });
+  });
+
+  socket.on('leaveCall', ({ chatId }) => {
+    console.log(`User left call: ${chatId}`);
+    socket.to(chatId).emit('user-left');
+  });
+ 
+
   //handle disconnection
 
   socket.on('disconnect',()=>{
