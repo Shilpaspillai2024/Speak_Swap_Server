@@ -23,10 +23,13 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.2",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "razorpay": "^2.9.5",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
@@ -36,6 +39,7 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/mongoose": "^5.11.96",
+    "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.12",
     "@types/nodemailer": "^6.4.17",
     "@types/socket.io": "^3.0.1",
