@@ -74,11 +74,14 @@ app.get("/", (req, res) => {
 
 //socket.io logic
 
+
+
+
 io.on("connection", (socket) => {
   console.log(`user connected ;${socket.id}`);
   console.log(`Transport used: ${socket.conn.transport.name}`);
 
-  // join a chat room
+ 
 
   socket.on("joinRoom", (chatId) => {
     socket.join(chatId);
@@ -103,7 +106,8 @@ io.on("connection", (socket) => {
     callback({ success: true, message: "Message sent successfully." });
   });
 
-
+  
+  
 
 
   socket.on("initiateCall", ({ chatId }) => {
@@ -132,8 +136,18 @@ io.on("connection", (socket) => {
 
   socket.on("acceptCall", ({ videoRoomId }) => {
    
-     socket.join(videoRoomId);
+
+    if (!videoRoomId) {
+      console.log("❌ Invalid videoRoomId for call acceptance");
+      return;
+    }
     console.log(`Call accepted in room ${videoRoomId} by ${socket.id}`);
+    socket.join(videoRoomId);
+
+    const room = io.sockets.adapter.rooms.get(videoRoomId);
+    const numParticipants = room ? room.size : 0;
+    console.log(`👥 Participants in video room: ${numParticipants}`);
+
 
     socket.to(videoRoomId).emit("callAccepted", {
       accepterId: socket.id,
@@ -144,42 +158,67 @@ io.on("connection", (socket) => {
   // WebRTC signaling: send answer
 
   socket.on("sendOffer", ({ offer, videoRoomId }) => {
-    console.log(`Relaying offer in video room ${videoRoomId}`);
-    socket.to(videoRoomId).emit("receiveOffer", { offer });
+    if (!offer || !videoRoomId) {
+      console.log("❌ Invalid offer data");
+      return;
+    }
+
+    console.log(`📤 Sending offer in room ${videoRoomId}`);
+    console.log(`SDP Type: ${offer.type}`);
+    
+    socket.to(videoRoomId).emit("receiveOffer", {
+      offer,
+      senderId: socket.id
+    });
   });
 
 
 
 
   socket.on("sendAnswer", ({ answer, videoRoomId }) => {
-    
-    console.log(
-      `Relaying answer from ${socket.id} to video room ${videoRoomId}`
-    );
+    if (!answer || !videoRoomId) {
+      console.log("❌ Invalid answer data");
+      return;
+    }
 
+    console.log(`📤 Sending answer in room ${videoRoomId}`);
+    console.log(`SDP Type: ${answer.type}`);
+    
     socket.to(videoRoomId).emit("receiveAnswer", {
       answer,
-      accepterId: socket.id,
+      senderId: socket.id
     });
   });
 
+  
   socket.on("sendCandidate", ({ candidate, videoRoomId }) => {
+    if (!candidate || !videoRoomId) {
+      console.log("❌ Invalid ICE candidate data");
+      return;
+    }
+
+    console.log(`🧊 ICE candidate for room ${videoRoomId}`);
+    console.log(`Candidate: ${candidate.candidate}`);
     
-
-    console.log("videoRoomId",videoRoomId)
-    console.log(
-      `Relaying ICE candidate from ${socket.id} to video room ${videoRoomId}`
-    );
-
     socket.to(videoRoomId).emit("receiveCandidate", {
       candidate,
-      peerId: socket.id,
+      senderId: socket.id
     });
   });
 
   socket.on("endCall", ({ videoRoomId }) => {
-   
-    socket.to(videoRoomId).emit("callEnded");
+    if (!videoRoomId) {
+      console.log("❌ Invalid videoRoomId for ending call");
+      return;
+    }
+
+    console.log(`⏹️ Ending call in room ${videoRoomId}`);
+    socket.to(videoRoomId).emit("callEnded", {
+      enderId: socket.id
+    });
+    
+    // Leave the video room
+    socket.leave(videoRoomId);
   });
 
   //handle disconnection
