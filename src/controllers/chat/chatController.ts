@@ -64,10 +64,10 @@ class ChatController{
 
 
     async updateLastMessage(req:Request,res:Response):Promise<void>{
-        const{chatId,message,timestamp,unreadCount}=req.body
+        const{chatId,message,timestamp}=req.body
         try {
            
-            await this.chatService.updateLastMessage(chatId,message,new Date(timestamp),unreadCount)
+            await this.chatService.updateLastMessage(chatId,message,new Date(timestamp))
             res.status(200).json({success:true})
         } catch (error:any) {
             res.status(500).json({ error: error.message });

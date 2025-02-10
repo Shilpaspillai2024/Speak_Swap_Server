@@ -20,12 +20,19 @@ class ChatRepository implements IChatRepository {
         return existingChat;
       }
 
+       // Initialize unreadCount array for all participants
+       const unreadCount = participants.map(participant => ({
+        participantId: participant.participantId,
+        count: 0
+      }));
+
       const chat = new Chat({
         participantIds,
         participants: participants.map((participant) => ({
           participantId: participant.participantId,
           role: participant.role,
         })),
+        unreadCount
       });
 
       console.log("createdchat", chat);
@@ -104,12 +111,11 @@ class ChatRepository implements IChatRepository {
     }
   }
 
-  async updateLastMessage(chatId: string, message: string, timestamp: Date,unreadCount:number): Promise<void> {
+  async updateLastMessage(chatId: string, message: string, timestamp: Date): Promise<void> {
       try {
           await Chat.findByIdAndUpdate(chatId, {
             lastMessage: { message, timestamp },
             lastActivity: timestamp,
-            unreadCount
           });
         } catch (error:any) {
           throw new Error(`Failed to update last message: ${error.message}`);

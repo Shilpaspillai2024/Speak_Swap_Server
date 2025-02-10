@@ -49,6 +49,20 @@ class MessageController{
           res.status(500).json({ error: error.message });
         }
       }
+
+
+      async getUnreadCount(req:Request,res:Response):Promise<void>{
+        const{participantId}=req.params;
+        try {
+          const unreadCount=await this.messageService.getUnreadCount(participantId)
+          res.status(200).json({unreadCount})
+          
+        } catch (error:any) {
+          res.status(500).json({error:error.message})
+        }
+
+
+      }
 }
 
 export default MessageController

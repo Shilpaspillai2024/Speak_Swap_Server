@@ -30,9 +30,8 @@ class ChatService  implements IChatService{
       chatId: string,
       message: string,
       timestamp: Date,
-      unreadCount:number,
     ): Promise<void>{
-        return await this.chatRepository.updateLastMessage(chatId,message,timestamp,unreadCount)
+        return await this.chatRepository.updateLastMessage(chatId,message,timestamp)
     }
 }
 

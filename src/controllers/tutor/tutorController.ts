@@ -344,6 +344,9 @@ class TutorController {
     console.log("tutorId", tutorId);
 
     const { schedule, timeZone } = req.body;
+    if (!tutorId) {
+      throw new Error("Tutor ID is required");
+    }
 
     if (!Array.isArray(schedule) || schedule.length === 0) {
       throw new Error("Invalid schedule format");

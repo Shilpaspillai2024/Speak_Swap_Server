@@ -110,18 +110,18 @@ io.on("connection", (socket) => {
   
 
 
-  socket.on("initiateCall", ({ chatId }) => {
+  socket.on("initiateCall", ({ chatId,callerName }) => {
     const videoRoomId = `${chatId}-video`;
-
+     console.log("callerName",callerName)
     console.log(`Call initiated by ${socket.id} for video room ${videoRoomId}`);
 
     socket.join(videoRoomId);
-
-    socket.to(chatId).emit("incomingCall", {
+    socket.broadcast.emit('incomingCall', {
       callerId: socket.id,
       videoRoomId,
       chatId,
-    });
+      callerName
+    })
   });
 
 
@@ -213,7 +213,7 @@ io.on("connection", (socket) => {
     }
 
     console.log(`⏹️ Ending call in room ${videoRoomId}`);
-    socket.to(videoRoomId).emit("callEnded", {
+    socket.to(videoRoomId).emit("remoteDisconnect", {
       enderId: socket.id
     });
     

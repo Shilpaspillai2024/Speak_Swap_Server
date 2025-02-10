@@ -11,6 +11,5 @@ export interface IChatRepository {
     chatId: string,
     message: string,
     timestamp: Date,
-    unreadCount:number,
   ): Promise<void>;
 }

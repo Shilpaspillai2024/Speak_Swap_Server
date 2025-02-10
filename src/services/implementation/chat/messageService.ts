@@ -28,6 +28,10 @@ class MessageService implements IMessageService{
    }
 
 
+
+   async getUnreadCount(participantId: string): Promise<number> {
+     return await this.messageRepository.getUnreadCount(participantId);
+   }
     
 }
 

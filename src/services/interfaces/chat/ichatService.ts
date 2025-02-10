@@ -11,7 +11,6 @@ interface IChatService {
     chatId: string,
     message: string,
     timestamp: Date,
-    unreadCount: number
   ): Promise<void>;
 }
 
