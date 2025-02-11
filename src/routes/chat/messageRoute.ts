@@ -20,7 +20,6 @@ router.post("/send",authMiddleware, (req, res) => messageController.createMessag
 router.get("/:chatId", authMiddleware,(req, res) => messageController.getMessagesByChatId(req, res));
 router.put("/markAsRead",authMiddleware, (req, res) => messageController.markMessagesAsRead(req, res));
 
-router.get('/unread/:participantId',authMiddleware,(req,res)=>messageController.getUnreadCount(req,res))
 
 
 

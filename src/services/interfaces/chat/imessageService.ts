@@ -11,7 +11,7 @@ interface IMessageService {
   getMessagesByChatId(chatId: string): Promise<IMessage[]>;
 
   markMessagesAsRead(chatId: string, participantId: string): Promise<void>;
-  getUnreadCount(participantId:string):Promise<number>
+ 
 
 }
 

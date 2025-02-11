@@ -89,6 +89,8 @@ io.on("connection", (socket) => {
     socket.to(chatId).emit("userJoined", { userId: socket.id });
   });
 
+
+ 
   //handling sending messages
 
   socket.on("sendMessage", (data, callback) => {
@@ -107,8 +109,7 @@ io.on("connection", (socket) => {
   });
 
   
-  
-
+ 
 
   socket.on("initiateCall", ({ chatId,callerName }) => {
     const videoRoomId = `${chatId}-video`;

@@ -32,13 +32,15 @@ const messageSchema = new Schema<IMessage>(
         type: String,
         required: true,
       },
+      
       timestamp: {
         type: Date,
         default: Date.now,
       },
+
       isRead:{
         type:Boolean,
-        default:false
+        default:false,
       }
     },
     { timestamps: true }

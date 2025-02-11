@@ -20,7 +20,7 @@ class ChatRepository implements IChatRepository {
         return existingChat;
       }
 
-       // Initialize unreadCount array for all participants
+      
        const unreadCount = participants.map(participant => ({
         participantId: participant.participantId,
         count: 0
@@ -53,13 +53,7 @@ class ChatRepository implements IChatRepository {
     }
   }
 
-  // async getChatsByParticipant(participantId: string): Promise<IChat[]> {
-  //     try {
-  //         return await Chat.find({ 'participants.participantId': participantId }).sort({ lastActivity: -1 });
-  //       } catch (error:any) {
-  //         throw new Error(`Failed to fetch chats for participant: ${error.message}`);
-  //       }
-  // }
+
 
   async getChatsByParticipant(participantId: string): Promise<IChat[]> {
     try {
