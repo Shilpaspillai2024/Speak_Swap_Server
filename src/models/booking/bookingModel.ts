@@ -3,7 +3,7 @@ import mongoose,{Document,Schema} from "mongoose";
 export interface IBooking extends Document{
     userId:mongoose.Types.ObjectId;
     tutorId:mongoose.Types.ObjectId;
-    selectedDay:string;
+    selectedDate:Date;
     selectedSlot:{startTime:string,endTime:string};
     status:'pending' |'confirmed'|'completed'|'cancelled';
     sessionFee:number;
@@ -25,8 +25,8 @@ const bookingSchema=new Schema<IBooking>({
         type: mongoose.Schema.Types.ObjectId,
          ref: 'Tutor', required: true ,
     },
-    selectedDay: { 
-        type: String, 
+    selectedDate: { 
+        type:Date, 
         required: true 
     },
   selectedSlot: { 

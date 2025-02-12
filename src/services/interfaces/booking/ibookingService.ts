@@ -9,7 +9,7 @@ interface IBookingService {
 
   getBookedSlots(
     tutorId: string,
-    selectedDay: string
+    selectedDate:Date
   ): Promise<{ startTime: string; endTime: string }[]>;
 
   getUserBookings(userId: string): Promise<IBooking[]>;

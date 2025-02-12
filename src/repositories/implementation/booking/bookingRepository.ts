@@ -41,11 +41,11 @@ class BookingRepository implements IBookingRepository {
 
   async getBookedSlots(
     tutorId: string,
-    selectedDay: string
+    selectedDate:Date
   ): Promise<{ startTime: string; endTime: string }[]> {
     const bookings = await Booking.find({
       tutorId,
-      selectedDay,
+      selectedDate,
       status: { $nin: ["pending", "completed", "cancelled"] },
     });
 

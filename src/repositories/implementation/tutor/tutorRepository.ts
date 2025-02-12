@@ -39,7 +39,7 @@ class TutorRepository implements ITutorRepository {
 
   async deleteSlot(
     id: string,
-    day: string,
+    date: string,
     slotIndex: number
   ): Promise<ITutor | null> {
     const tutor = await Tutor.findById(id);
@@ -47,7 +47,11 @@ class TutorRepository implements ITutorRepository {
       throw new Error("Tutor not found.");
     }
 
-    const availability = tutor.availability.find((a) => a.day === day);
+    const availability = tutor.availability.find((a) => {
+      return new Date(a.date).toISOString().split("T")[0] === date;
+    });
+
+
     if (
       !availability ||
       slotIndex < 0 ||
@@ -56,8 +60,8 @@ class TutorRepository implements ITutorRepository {
       throw new Error("Invalid day or slot index.");
     }
 
-    availability.slots.splice(slotIndex, 1); // Remove the slot at the specified index
-    tutor.availability = tutor.availability.filter((a) => a.slots.length > 0); // Remove empty days
+    availability.slots.splice(slotIndex, 1); 
+    tutor.availability = tutor.availability.filter((a) => a.slots.length > 0); 
 
     return tutor.save();
   }

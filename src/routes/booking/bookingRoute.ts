@@ -27,7 +27,7 @@ router.post("/verify-payment",authMiddleware,(req,res)=>bookingController.verify
 
 router.get('/:bookingId',authMiddleware,(req,res)=>bookingController.getBookingDetails(req,res))
 
-router.get('/booked-slots/:tutorId/:selectedDay',authMiddleware,(req,res)=>bookingController.getBookedSlots(req,res));
+router.get('/booked-slots/:tutorId/:selectedDate',authMiddleware,(req,res)=>bookingController.getBookedSlots(req,res));
 
 
 router.get('/user/bookings',authMiddleware,(req,res)=>bookingController.getUserBookings(req,res))

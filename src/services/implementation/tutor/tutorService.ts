@@ -315,10 +315,10 @@ class TutorService implements ITutorService{
   }
 
 
-  async deleteSlot(id: string, day: string, slotIndex: number): Promise<ITutor | null> {
+  async deleteSlot(id: string, date: string, slotIndex: number): Promise<ITutor | null> {
   
 
-    const updateTutor=await this.tutorRepository.deleteSlot(id,day,slotIndex)
+    const updateTutor=await this.tutorRepository.deleteSlot(id,date,slotIndex)
   
 
     if (!updateTutor) {

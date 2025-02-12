@@ -36,7 +36,7 @@ interface ITutorService {
 
   setAvailability(id: string, schedule: IAvailability[], timeZone: string): Promise<ITutor | null>;
 
-  deleteSlot(id: string, day: string, slotIndex: number): Promise<ITutor | null>;
+  deleteSlot(id: string, date: string, slotIndex: number): Promise<ITutor | null>;
 
   getAvailability(id: string): Promise<IAvailability[] | null>;
 }

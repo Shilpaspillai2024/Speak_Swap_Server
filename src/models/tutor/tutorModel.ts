@@ -2,19 +2,10 @@ import mongoose, { Schema, model } from "mongoose";
 import { ITutor } from "../../types/ITutor";
 
 const availabilitySchema = new Schema({
-  day: {
-    type: String,
-    enum: [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
-    required: true,
-  },
+ date:{
+  type:Date,
+  required:true,
+ },
   slots: [
     {
       startTime: {

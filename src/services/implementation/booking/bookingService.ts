@@ -45,9 +45,9 @@ class BookingService implements IBookingService {
       }
 
 
-      async getBookedSlots(tutorId: string, selectedDay: string): Promise<{ startTime: string; endTime: string }[]> {
+      async getBookedSlots(tutorId: string, selectedDate:Date): Promise<{ startTime: string; endTime: string }[]> {
         try {
-          return await this.bookingRepository.getBookedSlots(tutorId, selectedDay);
+          return await this.bookingRepository.getBookedSlots(tutorId, selectedDate);
           
         } catch (error) {
           throw new Error("failed to fetch booked slots")

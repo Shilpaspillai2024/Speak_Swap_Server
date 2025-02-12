@@ -348,29 +348,15 @@ class TutorController {
       throw new Error("Tutor ID is required");
     }
 
-    if (!Array.isArray(schedule) || schedule.length === 0) {
-      throw new Error("Invalid schedule format");
-    }
 
-    schedule.forEach((daySchedule) => {
-      if (
-        !daySchedule.day ||
-        !Array.isArray(daySchedule.slots) ||
-        daySchedule.slots.length === 0
-      ) {
-        throw new Error(`Invalid slots for day: ${daySchedule.day}`);
-      }
-    });
+   
+    
 
     if (!timeZone || typeof timeZone !== "string") {
       throw new Error("Invalid timezone");
     }
 
-    console.log("schedule from req.body", schedule);
-    console.log(
-      "Received schedule from frontend:",
-      JSON.stringify(schedule, null, 2)
-    );
+  
     try {
       const updatedTutor = await this.tutorService.setAvailability(
         tutorId,
@@ -395,12 +381,12 @@ class TutorController {
   }
 
   async deleteSlot(req: CustomRequest, res: Response): Promise<void> {
-    const { tutorId, day, slotIndex } = req.params;
+    const { tutorId, date, slotIndex } = req.params;
 
     try {
       const updateTutor = await this.tutorService.deleteSlot(
         tutorId,
-        day,
+        date,
         parseInt(slotIndex)
       );
       if (!updateTutor) {

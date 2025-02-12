@@ -31,9 +31,12 @@ class BookingController {
     try {
       const userId = req.user;
 
-      const { tutorId, selectedDay, selectedSlot, sessionFee } = req.body;
+      const { tutorId, selectedSlot, sessionFee } = req.body;
 
-      if (!userId || !tutorId || !selectedDay || !selectedSlot || !sessionFee) {
+
+      const selectedDate = new Date(req.body.selectedDate);
+
+      if (!userId || !tutorId || !selectedDate || !selectedSlot || !sessionFee) {
         res.status(400).json({ message: "Missing required fields" });
         return;
       }
@@ -48,7 +51,7 @@ class BookingController {
 
       const bookedSlots = await this.bookingService.getBookedSlots(
         tutorId,
-        selectedDay
+        selectedDate
       );
       const isSlotAvailable = !bookedSlots.some(
         (bookedSlot) =>
@@ -63,7 +66,7 @@ class BookingController {
       const booking = new Booking({
         userId,
         tutorId,
-        selectedDay,
+        selectedDate,
         selectedSlot,
         sessionFee,
         status: "pending",
@@ -153,10 +156,10 @@ class BookingController {
 
   async getBookedSlots(req: CustomRequest, res: Response): Promise<void> {
     try {
-      const { tutorId,selectedDay } = req.params;
+      const { tutorId} = req.params;
      
-
-      if (!selectedDay) {
+      const selectedDate = new Date(req.params.selectedDate);
+      if (!selectedDate) {
         res
           .status(400)
           .json({ success: false, message: "Missing selected day" });
@@ -165,7 +168,7 @@ class BookingController {
 
       const bookedSlots = await this.bookingService.getBookedSlots(
         tutorId,
-        selectedDay as string
+        selectedDate 
       );
 
       res.status(200).json({ success: true, data: bookedSlots });

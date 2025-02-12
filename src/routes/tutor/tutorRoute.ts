@@ -50,7 +50,7 @@ router.put('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.se
 
 
 
-router.delete('/:tutorId/availability/:day/:slotIndex',(req,res)=>tutorController.deleteSlot(req,res))
+router.delete('/:tutorId/availability/:date/:slotIndex',(req,res)=>tutorController.deleteSlot(req,res))
 
 router.get('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.getAvailability(req,res))
 
