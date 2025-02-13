@@ -1,11 +1,10 @@
 import { Response } from "express";
 import { CustomRequest } from "../../middlewares/authMiddleware";
-import Booking from "../../models/booking/bookingModel";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import IBookingService from "../../services/interfaces/booking/ibookingService";
-
+import { IBookingDTO } from "../../services/interfaces/booking/ibookingDTO";
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -29,9 +28,9 @@ class BookingController {
 
   async createBooking(req: CustomRequest, res: Response): Promise<void> {
     try {
-      const userId = req.user;
+     const userId = req.user;
 
-      const { tutorId, selectedSlot, sessionFee } = req.body;
+      const {tutorId, selectedSlot, sessionFee } = req.body;
 
 
       const selectedDate = new Date(req.body.selectedDate);
@@ -63,8 +62,8 @@ class BookingController {
         res.status(400).json({ message: "Selected slot is already booked" });
         return;
       }
-      const booking = new Booking({
-        userId,
+      const booking: IBookingDTO = {
+        userId: new mongoose.Types.ObjectId(userId),
         tutorId,
         selectedDate,
         selectedSlot,
@@ -72,7 +71,7 @@ class BookingController {
         status: "pending",
         paymentStatus: "pending",
         bookingDate: new Date(),
-      });
+      };
 
       const savedBooking = await this.bookingService.createBooking(booking);
 

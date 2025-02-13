@@ -1,10 +1,11 @@
 import { IBookingRepository } from "../../interfaces/booking/ibookingRepository";
 import Booking from "../../../models/booking/bookingModel";
+import { IBookingDTO } from "../../../services/interfaces/booking/ibookingDTO";
 import { IBooking } from "../../../models/booking/bookingModel";
 import mongoose from "mongoose";
 
 class BookingRepository implements IBookingRepository {
-  async createBooking(bookingData: IBooking): Promise<IBooking> {
+  async createBooking(bookingData: IBookingDTO): Promise<IBooking> {
     const booking = new Booking(bookingData);
     await booking.save();
     return booking;
@@ -62,8 +63,8 @@ class BookingRepository implements IBookingRepository {
         status: "confirmed", 
         paymentStatus: "paid", 
       })
-        .populate("tutorId", "name email profilePhoto timeZone")
-        .populate("userId", "fullName email")
+        .populate("tutorId", "_id name email profilePhoto timeZone")
+        .populate("userId", "_id fullName email")
         .sort({ bookingDate: -1 });
       return bookings;
     } catch (error) {
@@ -78,8 +79,8 @@ class BookingRepository implements IBookingRepository {
         status: "confirmed", 
         paymentStatus: "paid", 
       })
-        .populate("userId","fullName email phone profilePhoto knownLanguages learnLanguage learnProficiency")
-        .populate("tutorId","name email profilePhoto teachLanguage")
+        .populate("userId","_id fullName email phone profilePhoto knownLanguages learnLanguage learnProficiency")
+        .populate("tutorId","_id name email profilePhoto teachLanguage")
         .sort({ createdAt: -1 });
 
       return bookings;

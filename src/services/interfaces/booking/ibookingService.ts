@@ -1,7 +1,8 @@
 import { IBooking } from "../../../models/booking/bookingModel";
+import { IBookingDTO } from "./ibookingDTO";
 
 interface IBookingService {
-  createBooking(bookingData: IBooking): Promise<IBooking>;
+  createBooking(bookingData: IBookingDTO): Promise<IBooking>;
 
   updateOrderId(bookingId: string, orderId: string): Promise<IBooking | null>;
 

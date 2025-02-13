@@ -48,7 +48,8 @@ class TutorRepository implements ITutorRepository {
     }
 
     const availability = tutor.availability.find((a) => {
-      return new Date(a.date).toISOString().split("T")[0] === date;
+
+      return new Date(a.date).toISOString().split("T")[0] === new Date(date).toISOString().split("T")[0];
     });
 
 

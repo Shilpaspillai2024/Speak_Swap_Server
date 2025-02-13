@@ -13,7 +13,7 @@ import bookingRoute from "./routes/booking/bookingRoute";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import logger from "./middlewares/logger";
-import configureSocket from "./sockets/userSocket";
+import initializeSocket from "./config/socket";
 
 
 dotenv.config();
@@ -25,7 +25,7 @@ const server = http.createServer(app);
 
 
 
-configureSocket(server)
+const io=initializeSocket(server);
 
 app.use(json());
 app.use(urlencoded({ extended: true }));

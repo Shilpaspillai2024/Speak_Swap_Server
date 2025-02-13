@@ -1,32 +1,12 @@
-import { Server } from "socket.io";
-import { Server as HttpServer } from "http";
-
-
-
-// initialize socket io with the server
-
-const configureSocket =(server:HttpServer)=>{
-
-
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000", // Allow frontend origin
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  },
-
-  transports: ["websocket"],
-});
-
+import { Server ,Socket} from "socket.io";
 
 
 //socket.io logic
 
 
+const handleChatSocket=(io:Server)=>{
 
-
-io.on("connection", (socket) => {
+io.on("connection", (socket:Socket) => {
     console.log(`user connected ;${socket.id}`);
     console.log(`Transport used: ${socket.conn.transport.name}`);
   
@@ -178,7 +158,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  return io;
 }
 
-export default configureSocket;
+export default handleChatSocket;

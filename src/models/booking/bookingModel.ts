@@ -11,8 +11,7 @@ export interface IBooking extends Document{
     bookingDate:Date;
     paymentId?:string;
     orderId?: string;
-    meetingLink?: string;
-
+    
 }
 
 
@@ -32,7 +31,7 @@ const bookingSchema=new Schema<IBooking>({
   selectedSlot: { 
     type: Object,
      required: true 
-    }, // { startTime: String, endTime: String }
+    }, 
   status: {
      type: String, 
      enum: ['pending', 'confirmed', 'completed','cancelled'], 
@@ -58,9 +57,7 @@ orderId: {
     type: String, 
   },
 
-meetingLink:{
-    type:String,
-}
+
 },{ timestamps: true });
 
 const Booking = mongoose.model<IBooking>('Booking',bookingSchema);

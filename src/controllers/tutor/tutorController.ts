@@ -383,6 +383,10 @@ class TutorController {
   async deleteSlot(req: CustomRequest, res: Response): Promise<void> {
     const { tutorId, date, slotIndex } = req.params;
 
+    console.log("tutor Id",tutorId)
+    console.log("date",date)
+    console.log('slotindex',slotIndex)
+
     try {
       const updateTutor = await this.tutorService.deleteSlot(
         tutorId,

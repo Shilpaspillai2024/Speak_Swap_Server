@@ -2,6 +2,7 @@ import { IBookingRepository } from "../../../repositories/interfaces/booking/ibo
 import { IBooking } from "../../../models/booking/bookingModel";
 import IBookingService from "../../interfaces/booking/ibookingService";
 import IWalletService from "../../interfaces/wallet/iwalletService";
+import { IBookingDTO } from "../../interfaces/booking/ibookingDTO";
 
 class BookingService implements IBookingService {
     private bookingRepository: IBookingRepository;
@@ -14,7 +15,7 @@ class BookingService implements IBookingService {
     }
 
 
-    async createBooking(bookingData:IBooking):Promise<IBooking>{
+    async createBooking(bookingData:IBookingDTO):Promise<IBooking>{
 
       try {
         return await this.bookingRepository.createBooking(bookingData);
