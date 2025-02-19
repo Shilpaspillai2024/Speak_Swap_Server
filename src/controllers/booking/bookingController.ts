@@ -232,7 +232,46 @@ class BookingController {
     }
   }
 
+  async startSession(req:CustomRequest,res:Response):Promise<void>{
+    try {
 
+      const {bookingId}=req.params;
+
+      console.log("booking id for strt session",bookingId)
+
+      const booking=await this.bookingService.startSession(bookingId);
+      if(!booking){
+       res.status(404).json({message:"Booking not found"})
+       return
+      } 
+      res.status(200).json({message:"Session started",booking}) 
+      return
+      
+    } catch (error) {
+      res.status(500).json({ message: "Error starting session", error });
+      return
+    }
+  }
+
+
+  async completeSession(req:CustomRequest,res:Response):Promise<void>{
+    try {
+
+      const{ bookingId}=req.params;
+
+      const booking= await this.bookingService.completeSession(bookingId)
+      if(!booking){
+        res.status(404).json({message:"Booking not found"})
+        return
+       } 
+      res.status(200).json({ message: "Session completed", booking });
+      return
+      
+    } catch (error) {
+      res.status(500).json({ message: "Error completeting session", error });
+      return
+    }
+  }
  
 
 }

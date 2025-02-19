@@ -6,9 +6,12 @@ export interface IBookingDTO {
     selectedDate: Date;
     selectedSlot: { startTime: string; endTime: string };
     sessionFee: number;
-    status: "pending" | "confirmed" | "completed" | "cancelled";
+    status: "pending" | "confirmed" | "in-progress"|"completed" | "cancelled";
     paymentStatus: "paid" | "pending" | "failed" | "completed";
     bookingDate: Date;
     paymentId?: string;
     orderId?: string;
+    sessionStartTime?:Date;
+    sessionEndTime?:Date;
+    duration?:number;
   }

@@ -42,7 +42,7 @@ class BookingRepository implements IBookingRepository {
 
   async getBookedSlots(
     tutorId: string,
-    selectedDate:Date
+    selectedDate: Date
   ): Promise<{ startTime: string; endTime: string }[]> {
     const bookings = await Booking.find({
       tutorId,
@@ -60,8 +60,8 @@ class BookingRepository implements IBookingRepository {
     try {
       const bookings = await Booking.find({
         userId: new mongoose.Types.ObjectId(userId),
-        status: "confirmed", 
-        paymentStatus: "paid", 
+        status: "confirmed",
+        paymentStatus: "paid",
       })
         .populate("tutorId", "_id name email profilePhoto timeZone")
         .populate("userId", "_id fullName email")
@@ -76,11 +76,14 @@ class BookingRepository implements IBookingRepository {
     try {
       const bookings = await Booking.find({
         tutorId: new mongoose.Types.ObjectId(tutorId),
-        status: "confirmed", 
-        paymentStatus: "paid", 
+        status: "confirmed",
+        paymentStatus: "paid",
       })
-        .populate("userId","_id fullName email phone profilePhoto knownLanguages learnLanguage learnProficiency")
-        .populate("tutorId","_id name email profilePhoto teachLanguage")
+        .populate(
+          "userId",
+          "_id fullName email phone profilePhoto knownLanguages learnLanguage learnProficiency"
+        )
+        .populate("tutorId", "_id name email profilePhoto teachLanguage")
         .sort({ createdAt: -1 });
 
       return bookings;
@@ -89,8 +92,40 @@ class BookingRepository implements IBookingRepository {
     }
   }
 
+  async startSession(
+    bookingId: string,
+    sessionStartTime: Date
+  ): Promise<IBooking | null> {
+    console.log("start sesssion from repos",bookingId,sessionStartTime)
+    return await Booking.findByIdAndUpdate(
+      bookingId,
+      { sessionStartTime, status: "in-progress" },
+      { new: true }
+    );
+  }
 
-   
+  async completeSession(
+    bookingId: string,
+    sessionEndTime: Date
+  ): Promise<IBooking | null> {
+    const booking = await Booking.findById(bookingId);
+    if (!booking || !booking.sessionStartTime) return null;
+
+    const duration = Math.round(
+      (sessionEndTime.getTime() - booking.sessionStartTime.getTime()) / 6000
+    );
+    return await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        sessionEndTime,
+        duration,
+        status: "completed",
+      },
+      {
+        new: true,
+      }
+    );
+  }
 }
 
 export default BookingRepository;

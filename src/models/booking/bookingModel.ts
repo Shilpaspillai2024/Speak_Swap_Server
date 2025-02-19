@@ -5,12 +5,15 @@ export interface IBooking extends Document{
     tutorId:mongoose.Types.ObjectId;
     selectedDate:Date;
     selectedSlot:{startTime:string,endTime:string};
-    status:'pending' |'confirmed'|'completed'|'cancelled';
+    status:'pending' |'confirmed'|'in-progress' | 'completed'|'cancelled';
     sessionFee:number;
     paymentStatus:'paid'| 'pending' | 'failed'|'completed';
     bookingDate:Date;
     paymentId?:string;
     orderId?: string;
+    sessionStartTime?:Date;
+    sessionEndTime?:Date;
+    duration?:number;
     
 }
 
@@ -34,7 +37,7 @@ const bookingSchema=new Schema<IBooking>({
     }, 
   status: {
      type: String, 
-     enum: ['pending', 'confirmed', 'completed','cancelled'], 
+     enum: ['pending', 'confirmed','in-progress', 'completed','cancelled'], 
      default: 'pending'
      },
   sessionFee: { 
@@ -56,6 +59,17 @@ const bookingSchema=new Schema<IBooking>({
 orderId: {
     type: String, 
   },
+sessionStartTime:{
+
+  type:Date,
+},
+sessionEndTime:{
+  type:Date,
+},
+duration:{
+  type:Number,
+}
+
 
 
 },{ timestamps: true });

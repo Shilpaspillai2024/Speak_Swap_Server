@@ -24,6 +24,13 @@ interface IBookingService {
     amount: number,
     creditedBy: string
   ): Promise<void>;
+
+
+     startSession(bookingId:string):Promise<IBooking | null>;
+
+     completeSession(bookingId:string):Promise<IBooking | null>;
+     
+     
 }
 
 export default IBookingService;

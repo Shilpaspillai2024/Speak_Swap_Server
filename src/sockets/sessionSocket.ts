@@ -100,7 +100,7 @@ const handleTutorSession = (io: Server) => {
     });
 
     // Handle early session termination
-    socket.on("endSession", ({ bookingId }) => {
+    socket.on("endSession", ({ bookingId}) => {
       if (!bookingId || !activeSessions.has(bookingId)) {
         console.warn(`[${new Date().toISOString()}] [ERROR] Invalid session end request from ${socket.id}`);
         socket.emit("sessionError", "Invalid session");
@@ -108,10 +108,26 @@ const handleTutorSession = (io: Server) => {
       }
 
       console.log(`[${new Date().toISOString()}] [SESSION END] Session ended early by ${socket.id} for Booking ${bookingId}`);
-      socket.to(bookingId).emit("sessionEnded", { enderId: socket.id });
+      socket.to(bookingId).emit("sessionEnded", { enderId: socket.id,
+        message:`session ended`
+       });
 
       activeSessions.delete(bookingId);
       socket.leave(bookingId);
+    });
+
+
+
+
+    socket.on("chatMessage", ({ message, bookingId }) => {
+      if (!bookingId || !activeSessions.has(bookingId)) {
+        console.warn(`[${new Date().toISOString()}] [ERROR] Invalid chat message or expired session from ${socket.id}`);
+        socket.emit("sessionError", "Invalid session");
+        return;
+      }
+    
+      console.log(`[${new Date().toISOString()}] [CHAT] Message sent in session ${bookingId}`);
+      socket.to(bookingId).emit("chatMessage", message);
     });
 
     socket.on("disconnect", () => {

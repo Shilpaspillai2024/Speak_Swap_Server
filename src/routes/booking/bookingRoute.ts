@@ -34,4 +34,9 @@ router.get('/user/bookings',authMiddleware,(req,res)=>bookingController.getUserB
 
 
 router.get('/tutor/bookings',authMiddleware,(req,res)=>bookingController.getTutorBookings(req,res))
+
+router.patch('/start-session/:bookingId',authMiddleware,(req,res)=>bookingController.startSession(req,res))
+
+router.patch('/complete-session/:bookingId',authMiddleware,(req,res)=>bookingController.completeSession(req,res))
+
 export default router;

@@ -98,6 +98,16 @@ class BookingService implements IBookingService {
         }
       }
 
+
+
+      async startSession(bookingId: string): Promise<IBooking | null> {
+        console.log("start session from service",bookingId)
+        return await this.bookingRepository.startSession(bookingId,new Date());
+      }
+
+      async completeSession(bookingId: string): Promise<IBooking | null> {
+        return await this.bookingRepository.completeSession(bookingId,new Date());
+      }
      
 }
 

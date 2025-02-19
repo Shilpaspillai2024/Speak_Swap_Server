@@ -9,7 +9,8 @@ export interface IBookingRepository{
     getBookedSlots(tutorId: string, selectedDate:Date): Promise<{ startTime: string; endTime: string }[]>;
     getBooking(userId:string):Promise<IBooking[] >
     getTutorBookings(tutorId:string):Promise<IBooking[]>
-
+    startSession(bookingId:string,sessionStartTime:Date):Promise<IBooking | null>;
+    completeSession(bookingId:string,sessionEndTime:Date):Promise<IBooking | null>;
   
 
 }
