@@ -4,6 +4,9 @@ import AdminService from "../../services/implementation/admin/adminService";
 import AdminRepository from "../../repositories/implementation/admin/adminRepository";
 import adminAuthenticationMiddleware from "../../middlewares/adminAuthMiddleware";
 import AdminBookingController from "../../controllers/admin/adminBookingController";
+import AdminDashboardController from "../../controllers/admin/adminDashboardController"
+import  DashboardService  from "../../services/implementation/admin/adminDashboradService";
+import AdminDashboardRepository  from "../../repositories/implementation/admin/adminDashboardRepository";
 
 
 const adminRepository=new AdminRepository();
@@ -11,6 +14,10 @@ const adminService=new AdminService(adminRepository);
 const adminController=new AdminController(adminService);
 
 const adminBookingController=new AdminBookingController(adminService);
+
+const adminDasbordRepository=new AdminDashboardRepository();
+const adminDashboardService=new DashboardService(adminDasbordRepository);
+const adminDashboardController=new AdminDashboardController(adminDashboardService)
 
 const router=Router()
 
@@ -47,4 +54,7 @@ router.get('/bookings',adminAuthenticationMiddleware,(req,res)=>adminBookingCont
 
 router.get('/bookings/:bookingId',adminAuthenticationMiddleware,(req,res)=>adminBookingController.getBookingDetails(req,res));
 
+
+
+router.get(`/dashboard`,adminAuthenticationMiddleware,(req,res)=>adminDashboardController.getDashboardData(req,res))
 export default router;

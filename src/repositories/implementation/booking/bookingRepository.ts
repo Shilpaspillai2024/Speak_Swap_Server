@@ -141,6 +141,43 @@ class BookingRepository implements IBookingRepository {
   async findById(bookingId: string): Promise<IBooking | null> {
     return await Booking.findById(bookingId)
   }
+
+
+  async getPopulatedBooking(bookingId: string): Promise<IBooking | null> {
+    return await Booking.findById(bookingId)
+    .populate("userId","_id fullName email phone")
+    .populate("tutorId","_id name email profilePhoto ")
+  }
+
+
+
+  async getUpcomingSessionsCount(tutorId: string): Promise<number> {
+   return await Booking.countDocuments({
+    tutorId,
+    status:"confirmed"
+   })
+ }
+
+ async getCompletedSessionsCount(tutorId: string): Promise<number> {
+   return await Booking.countDocuments({
+    tutorId,
+    status:"completed"
+   })
+ }
+
+ async getCancelledSesionsCount(tutorId: string): Promise<number> {
+   return await Booking.countDocuments({
+    tutorId,
+    status:"cancelled"
+   })
+ }
+
+
+
+
+
+
+
 }
 
 export default BookingRepository;

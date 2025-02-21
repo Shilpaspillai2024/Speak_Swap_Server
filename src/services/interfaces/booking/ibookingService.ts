@@ -33,7 +33,11 @@ interface IBookingService {
      cancelBooking(tutorId:string,bookingId:string):Promise<IBooking | null>;
 
    
-     
+     getTutorSessionStatics(tutorId:string):Promise<{
+      upcomingSessions:number;
+      completeSessions:number;
+      cancelSessions:number;
+     }>
      
 }
 

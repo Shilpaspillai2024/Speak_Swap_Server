@@ -45,4 +45,7 @@ router.patch('/complete-session/:bookingId',authMiddleware,(req,res)=>bookingCon
 
 router.put(`/cancel/:bookingId`,authMiddleware,(req,res)=>bookingController.cancelBooking(req,res))
 
+
+
+router.get(`/dashboard/:tutorId`,authMiddleware,(req,res)=>bookingController.getTutorDashboardStats(req,res))
 export default router;

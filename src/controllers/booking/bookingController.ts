@@ -296,9 +296,22 @@ class BookingController {
   }
 
  
+ 
 
+async getTutorDashboardStats(req:CustomRequest,res:Response):Promise<void>{
 
+  try {
 
+    const {tutorId}=req.params
+    const stats=await this.bookingService.getTutorSessionStatics(tutorId)
+    res.status(200).json(stats)
+    
+  } catch (error) {
+     console.error("Error fetching tutor dashboard stats:", error);
+        res.status(500).json({ message: "Server Error" });
+  }
+
+}
 
 }
 

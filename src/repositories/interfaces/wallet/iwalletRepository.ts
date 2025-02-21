@@ -6,7 +6,7 @@ interface IWalletRepository{
     addFunds(tutorId:string,amount:number,description:string,creditedBy:string):Promise<IWallet | null>;
     withdrawFunds(tutorId:string,amount:number):Promise<IWallet | null>;
     deductFunds(tutorId:string,amount:number):Promise<IWallet | null>
-
+    
 }
 
 export default IWalletRepository;

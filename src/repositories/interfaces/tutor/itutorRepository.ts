@@ -10,5 +10,6 @@ interface ITutorRepository{
     deleteSlot(id:string,date:string,slotIndex:number):Promise<ITutor | null>;
     getAvailability(id:string):Promise<IAvailability[] | null>
     getAllTutors():Promise<ITutor[]>
+    
 }
 export default ITutorRepository

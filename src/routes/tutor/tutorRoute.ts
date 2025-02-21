@@ -14,11 +14,13 @@ import UserWalletRepository from "../../repositories/implementation/wallet/userW
 const router=Router()
 
 const tutorRepository=new TutorRepository()
-const tutorService=new TutorService(tutorRepository)
+const walletRepository = new WalletRepository();
+
+
+const tutorService=new TutorService(tutorRepository,walletRepository)
 const tutorController=new TutorController(tutorService)
 
 
-const walletRepository = new WalletRepository();
 
 const userWalletRepository=new UserWalletRepository();
 
@@ -64,5 +66,7 @@ router.get('/wallet-details', authMiddleware, (req, res) =>
   );
 
 
-  router.post('/withdraw',authMiddleware,(req,res)=>walletController.withdrawFunds(req,res))
+  router.post('/withdraw',authMiddleware,(req,res)=>walletController.withdrawFunds(req,res));
+
+  router.get(`/earnings/:tutorId`,authMiddleware,(req,res)=>tutorController.getTutorEarnings(req,res))
 export default router

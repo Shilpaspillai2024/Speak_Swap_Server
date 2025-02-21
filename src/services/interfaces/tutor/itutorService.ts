@@ -39,6 +39,9 @@ interface ITutorService {
   deleteSlot(id: string, date: string, slotIndex: number): Promise<ITutor | null>;
 
   getAvailability(id: string): Promise<IAvailability[] | null>;
+
+
+  getTutorEarnings(tutorId:string):Promise<{date:string;amount:number}[]>
 }
 
 export default ITutorService;

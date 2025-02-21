@@ -14,7 +14,7 @@ interface IWalletService {
   getWalletDetails(tutorId: string): Promise<IWallet | null>;
   withdrawFunds(tutorId:string,amount:number):Promise<IWallet | null>;
   deductFunds(tutorId:string,amount:number):Promise<IWallet | null>;
-
+  
 
   /// user related wallet service interface
 
@@ -22,6 +22,8 @@ interface IWalletService {
   getUserWalletDetails(userId: string): Promise<IUserWallet | null>;
   creditUserWallet(userId: string, amount: number, description: string): Promise<IUserWallet>;
   debitUserWallet(userId: string, amount: number): Promise<IUserWallet | null>;
+
+ 
 }
 
 export default IWalletService;

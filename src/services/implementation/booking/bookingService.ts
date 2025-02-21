@@ -3,8 +3,8 @@ import { IBooking } from "../../../models/booking/bookingModel";
 import IBookingService from "../../interfaces/booking/ibookingService";
 import IWalletService from "../../interfaces/wallet/iwalletService";
 import { IBookingDTO } from "../../interfaces/booking/ibookingDTO";
-
-import moment from "moment"
+import EmailUtils from "../../../utils/emailUtils";
+import moment from "moment";
 
 class BookingService implements IBookingService {
   private bookingRepository: IBookingRepository;
@@ -120,59 +120,121 @@ class BookingService implements IBookingService {
     if (booking.tutorId.toString() !== tutorId) {
       throw new Error("Unauthorized: You can only cancel your own sessions");
     }
-   
+
     const sessionStartDateTime = new Date(booking.selectedDate);
 
     console.log("Raw startTime from DB:", booking.selectedSlot.startTime);
-  
+
     // Convert 12-hour format to 24-hour format using moment.js
-    const formattedTime = moment(booking.selectedSlot.startTime, "hh:mm A").format("HH:mm");
+    const formattedTime = moment(
+      booking.selectedSlot.startTime,
+      "hh:mm A"
+    ).format("HH:mm");
     const [hours, minutes] = formattedTime.split(":").map(Number);
-  
+
     console.log("Converted 24-hour time:", hours, minutes);
-  
+
     sessionStartDateTime.setHours(hours, minutes, 0, 0);
-  
+
     const now = new Date();
     console.log("Now:", now);
     console.log("Session Start DateTime:", sessionStartDateTime);
-  
+
     const timeDifference = sessionStartDateTime.getTime() - now.getTime();
     const hoursDifference = timeDifference / (1000 * 60 * 60);
-  
+
     if (hoursDifference < 24) {
-      throw new Error("Cannot cancel a session less than 24 hours before it starts");
+      throw new Error(
+        "Cannot cancel a session less than 24 hours before it starts"
+      );
     }
-  
-    const updatedBooking = await this.bookingRepository.cancelBooking(bookingId);
-    
+
+    const updatedBooking = await this.bookingRepository.cancelBooking(
+      bookingId
+    );
+
     if (updatedBooking) {
       const refundAmount = updatedBooking.sessionFee;
-      console.log("refundAmount",refundAmount)
+      console.log("refundAmount", refundAmount);
       if (refundAmount > 0) {
         // await this.walletService.withdrawFunds(tutorId, refundAmount);
         await this.walletService.deductFunds(tutorId, refundAmount);
         console.log("Deduction function executed");
-        
-        let userWallet = await this.walletService.getUserWalletDetails(updatedBooking.userId.toString());
-        
-       
+
+        let userWallet = await this.walletService.getUserWalletDetails(
+          updatedBooking.userId.toString()
+        );
+
         if (!userWallet) {
-          console.log(`User wallet not found, creating a new wallet for user ${updatedBooking.userId}`);
-          userWallet = await this.walletService.createUserWallet(updatedBooking.userId.toString());
+          console.log(
+            `User wallet not found, creating a new wallet for user ${updatedBooking.userId}`
+          );
+          userWallet = await this.walletService.createUserWallet(
+            updatedBooking.userId.toString()
+          );
         }
 
-        
         await this.walletService.creditUserWallet(
           updatedBooking.userId.toString(),
           refundAmount,
           "Refund for cancelled session"
         );
 
-        console.log(`Refunded ₹${refundAmount} to user ${updatedBooking.userId}`);
+        try {
+          const populatedBooking =
+            await this.bookingRepository.getPopulatedBooking(bookingId);
+
+          if (populatedBooking && populatedBooking.userId) {
+            const formattedDate = moment(populatedBooking.selectedDate).format(
+              "MMMM D, YYYY"
+            );
+            interface PopulatedUser {
+              email: string;
+              fullName: string;
+            }
+            interface PopulatedTutor {
+              name: string;
+            }
+
+            const userId = populatedBooking.userId as unknown as PopulatedUser;
+            const tutorId =
+              populatedBooking.tutorId as unknown as PopulatedTutor;
+
+            await EmailUtils.sendSessionCancellationNotification(
+              userId.email,
+              userId.fullName,
+              {
+                tutorName: tutorId.name,
+                sessionDate: formattedDate,
+                sessionTime: `${populatedBooking.selectedSlot.startTime} - ${populatedBooking.selectedSlot.endTime}`,
+                refundAmount: refundAmount,
+              }
+            );
+            console.log(`Cancellation notification sent to ${userId.email}`);
+          }
+        } catch (emailError) {
+          console.error("Failed to send cancellation email:", emailError);
+        }
+
+        console.log(
+          `Refunded ₹${refundAmount} to user ${updatedBooking.userId}`
+        );
       }
     }
     return updatedBooking;
+  }
+
+
+
+
+
+
+  async getTutorSessionStatics(tutorId: string): Promise<{ upcomingSessions: number; completeSessions: number; cancelSessions: number; }> {
+    const upcomingSessions=await this.bookingRepository.getUpcomingSessionsCount(tutorId)
+    const completeSessions=await this.bookingRepository.getCompletedSessionsCount(tutorId)
+    const cancelSessions=await this.bookingRepository.getCancelledSesionsCount(tutorId)
+
+    return {upcomingSessions,completeSessions,cancelSessions}
   }
 }
 

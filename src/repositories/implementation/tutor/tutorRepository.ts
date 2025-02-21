@@ -1,4 +1,5 @@
 import { Tutor } from "../../../models/tutor/tutorModel";
+import { IWallet } from "../../../models/tutor/walletModel";
 import { ITutor, IAvailability } from "../../../types/ITutor";
 import ITutorRepository from "../../interfaces/tutor/itutorRepository";
 
@@ -78,5 +79,8 @@ class TutorRepository implements ITutorRepository {
   async getAllTutors(): Promise<ITutor[]> {
     return await Tutor.find();
   }
+
+
+  
 }
 export default TutorRepository;

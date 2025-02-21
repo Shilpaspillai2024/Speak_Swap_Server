@@ -427,6 +427,26 @@ class TutorController {
       res.status(500).json({ message: "something went wrong" });
     }
   }
+
+
+
+  async getTutorEarnings(req:CustomRequest,res:Response):Promise<void>{
+    try {
+      const {tutorId}=req.params
+
+      if (!tutorId) {
+         res.status(400).json({ message: "Tutor ID is required" });
+         return
+      }
+
+      const earningData=await this.tutorService.getTutorEarnings(tutorId);
+      res.json({ earningData });
+      
+    } catch (error) {
+      console.error("Error fetching earnings:", error);
+    res.status(500).json({ message: "Server error" });
+    }
+  }
 }
 
 export default TutorController;

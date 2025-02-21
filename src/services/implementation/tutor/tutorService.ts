@@ -6,14 +6,17 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cloudinary from "../../../config/cloudinaryConfig";
 import ITutorService from "../../interfaces/tutor/itutorService";
+import IWalletRepository from "../../../repositories/interfaces/wallet/iwalletRepository";
 
 dotenv.config();
 
 class TutorService implements ITutorService{
   private tutorRepository: ITutorRepository;
+  private walletRepository:IWalletRepository;
 
-  constructor(tutorRepository: ITutorRepository) {
+  constructor(tutorRepository: ITutorRepository,walletRepository:IWalletRepository) {
     this.tutorRepository = tutorRepository;
+    this.walletRepository=walletRepository;
   }
 
   //generate jwt
@@ -332,6 +335,58 @@ class TutorService implements ITutorService{
 
     return await this.tutorRepository.getAvailability(id)
   }
+
+
+
+
+  async getTutorEarnings(tutorId: string): Promise<{ date: string; amount: number; }[]> {
+    const wallet=await this.walletRepository.getWalletByTutorId(tutorId)
+  
+  
+    if(!wallet){
+      return [];
+    }
+  
+    // const earningsByDate: Record<string, number> = {};
+  
+      // wallet.transactions.forEach((txn) => {
+      //   if (txn.type === "credit") {
+      //     const dateKey = txn.date.toISOString().split("T")[0]; 
+      //     earningsByDate[dateKey] = (earningsByDate[dateKey] || 0) + txn.amount;
+      //   }
+      // });
+  
+      // return Object.entries(earningsByDate).map(([date, amount]) => ({ date, amount }));
+  
+      const earningsByDate: Record<string, { amount: number; type: string }> = {};
+
+      wallet.transactions.forEach((txn) => {
+        const dateKey = txn.date.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+    
+        if (!earningsByDate[dateKey]) {
+          earningsByDate[dateKey] = { amount: 0, type: txn.type };
+        }
+    
+        if (txn.type === "credit") {
+          earningsByDate[dateKey].amount += txn.amount; // Add earnings
+        } else if (txn.type === "debit") {
+          earningsByDate[dateKey].amount -= txn.amount; // Subtract debits (refunds)
+        }
+      });
+    
+      return Object.entries(earningsByDate).map(([date, data]) => ({
+        date,
+        amount: data.amount,
+        type: data.type,
+      }));
+
+      
+
+
+
+  }
+  
+  
 
 }
 
