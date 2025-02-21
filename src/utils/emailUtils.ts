@@ -61,7 +61,7 @@ class EmailUtils{
           const mailOptions={
             from:`"SpeakSwap"<${process.env.GMAIL_USER}>`,
             to:email,
-            subject:"your otp fro speak swap signup",
+            subject:"your otp from speak swap signup",
             html:htmlContent,
         }
 

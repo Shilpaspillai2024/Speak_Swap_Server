@@ -272,7 +272,33 @@ class BookingController {
       return
     }
   }
+
+
+  // cancel booking
+
+  async cancelBooking(req:CustomRequest,res:Response):Promise<void>{
+    try {
+     const {bookingId}=req.params;
+     const tutorId=req.user;
+
+     if(!tutorId){
+      res.status(403).json({ message: "Unauthorized" });
+      return;
+     }
+
+     const result=await this.bookingService.cancelBooking(tutorId,bookingId)
+     res.status(200).json({ message: "Session cancelled successfully", result });
+      
+    } catch (error:unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to cancel session";
+       res.status(400).json({ message: errorMessage });
+    }
+  }
+
  
+
+
+
 
 }
 

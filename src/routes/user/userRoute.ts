@@ -7,6 +7,14 @@ import GeoService from "../../services/implementation/user/geoService";
 import upload from "../../middlewares/uploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
 import TutorRepository from "../../repositories/implementation/tutor/tutorRepository";
+
+import WalletService from "../../services/implementation/wallet/walletService";
+import WalletRepository from "../../repositories/implementation/wallet/walletRepository";
+import UserWalletRepository from "../../repositories/implementation/wallet/userWalletRepository";
+import WalletController from "../../controllers/wallet/walletController";
+
+
+
 const router=Router()
 
 const userRepository =new UserRepository();
@@ -17,6 +25,12 @@ const userController=new UserController(userService)
 const geoService=new GeoService()
 const geoController=new GeoController(geoService)
 
+
+const walletRepository = new WalletRepository();
+const userWalletRepository=new UserWalletRepository();
+
+const walletService = new WalletService(walletRepository,userWalletRepository);
+const walletController = new WalletController(walletService);
 
 
 
@@ -57,5 +71,8 @@ router.put('/update',authMiddleware,(req,res)=>userController.updateUser(req,res
 router.get("/tutors",authMiddleware,(req,res)=>userController.listTutorsForUser(req,res))
 
 router.get("/tutors/:tutorId",authMiddleware,(req,res)=>userController.tutorProfile(req,res))
+
+
+router.get(`/wallet`,authMiddleware,(req,res)=>walletController.getUserWalletDetails(req,res))
 
 export default router;

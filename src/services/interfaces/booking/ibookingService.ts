@@ -29,6 +29,10 @@ interface IBookingService {
      startSession(bookingId:string):Promise<IBooking | null>;
 
      completeSession(bookingId:string):Promise<IBooking | null>;
+
+     cancelBooking(tutorId:string,bookingId:string):Promise<IBooking | null>;
+
+   
      
      
 }

@@ -11,6 +11,8 @@ export interface IBookingRepository{
     getTutorBookings(tutorId:string):Promise<IBooking[]>
     startSession(bookingId:string,sessionStartTime:Date):Promise<IBooking | null>;
     completeSession(bookingId:string,sessionEndTime:Date):Promise<IBooking | null>;
-  
+    cancelBooking(bookingId:string):Promise<IBooking | null>
+
+  findById(bookingId:string):Promise<IBooking | null>
 
 }

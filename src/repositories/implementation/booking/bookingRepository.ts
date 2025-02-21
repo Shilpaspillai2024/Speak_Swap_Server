@@ -77,6 +77,7 @@ class BookingRepository implements IBookingRepository {
       const bookings = await Booking.find({
         tutorId: new mongoose.Types.ObjectId(tutorId),
         status: "confirmed",
+        // status:{$in:["pending","confirmed"]},
         paymentStatus: "paid",
       })
         .populate(
@@ -125,6 +126,20 @@ class BookingRepository implements IBookingRepository {
         new: true,
       }
     );
+  }
+
+
+  async cancelBooking(bookingId: string): Promise<IBooking | null> {
+    return await Booking.findByIdAndUpdate(
+      bookingId,{
+        status:"cancelled",},
+        {new :true}
+    );
+  }
+
+
+  async findById(bookingId: string): Promise<IBooking | null> {
+    return await Booking.findById(bookingId)
   }
 }
 

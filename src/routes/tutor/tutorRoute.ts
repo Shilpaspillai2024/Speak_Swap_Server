@@ -9,6 +9,7 @@ import WalletService from "../../services/implementation/wallet/walletService";
 import WalletRepository from "../../repositories/implementation/wallet/walletRepository";
 import WalletController from "../../controllers/wallet/walletController";
 
+import UserWalletRepository from "../../repositories/implementation/wallet/userWalletRepository";
 
 const router=Router()
 
@@ -18,7 +19,10 @@ const tutorController=new TutorController(tutorService)
 
 
 const walletRepository = new WalletRepository();
-const walletService = new WalletService(walletRepository);
+
+const userWalletRepository=new UserWalletRepository();
+
+const walletService = new WalletService(walletRepository,userWalletRepository);
 const walletController = new WalletController(walletService);
 
 
@@ -58,4 +62,7 @@ router.get('/:tutorId/availability',authMiddleware,(req,res)=>tutorController.ge
 router.get('/wallet-details', authMiddleware, (req, res) => 
     walletController.getWalletDetails(req, res)
   );
+
+
+  router.post('/withdraw',authMiddleware,(req,res)=>walletController.withdrawFunds(req,res))
 export default router

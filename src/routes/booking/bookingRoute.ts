@@ -5,6 +5,7 @@ import BookingService from "../../services/implementation/booking/bookingService
 import authMiddleware from "../../middlewares/authMiddleware";
 import WalletService from "../../services/implementation/wallet/walletService";
 import WalletRepository from "../../repositories/implementation/wallet/walletRepository";
+import UserWalletRepository from "../../repositories/implementation/wallet/userWalletRepository";
 
 const router=Router();
 
@@ -12,8 +13,10 @@ const bookingRepository =new BookingRepository();
 
 const walletRepository = new WalletRepository();
 
+const userWalletRepository=new UserWalletRepository();
 
-const walletService = new WalletService(walletRepository);
+
+const walletService = new WalletService(walletRepository,userWalletRepository);
 
 const bookingService=new BookingService(bookingRepository,walletService);
 
@@ -38,5 +41,8 @@ router.get('/tutor/bookings',authMiddleware,(req,res)=>bookingController.getTuto
 router.patch('/start-session/:bookingId',authMiddleware,(req,res)=>bookingController.startSession(req,res))
 
 router.patch('/complete-session/:bookingId',authMiddleware,(req,res)=>bookingController.completeSession(req,res))
+
+
+router.put(`/cancel/:bookingId`,authMiddleware,(req,res)=>bookingController.cancelBooking(req,res))
 
 export default router;
