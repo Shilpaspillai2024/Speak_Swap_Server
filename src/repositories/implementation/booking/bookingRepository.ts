@@ -25,15 +25,50 @@ class BookingRepository implements IBookingRepository {
 
   async updateBookingPaymentStatus(
     bookingId: string,
-    paymentStatus: string
+    paymentStatus: string,
+    failureReason?: string
   ): Promise<IBooking | null> {
-    const status = paymentStatus === "paid" ? "confirmed" : "pending";
+    
 
-    return await Booking.findByIdAndUpdate(
-      bookingId,
-      { paymentStatus, status },
-      { new: true }
-    );
+    interface BookingStatusUpdate {
+      paymentStatus: string;
+      status: string;
+      failureReason?: string;
+    }
+
+    const status =
+      paymentStatus === "paid"
+        ? "confirmed"
+        : paymentStatus === "failed"
+        ? "payment_failed"
+        : "pending";
+
+    const updateData: BookingStatusUpdate = { paymentStatus, status };
+
+    if (failureReason && paymentStatus === "failed") {
+      updateData.failureReason = failureReason;
+    }
+
+    return await Booking.findByIdAndUpdate(bookingId, updateData, {
+      new: true,
+    });
+  }
+
+  async getFailedBooking(
+    userId: string,
+    tutorId: string,
+    selectedDate: Date,
+    selectedSlot: { startTime: string; endTime: string }
+  ): Promise<IBooking | null> {
+    return await Booking.findOne({
+      userId,
+      tutorId,
+      selectedDate,
+      "selectedSlot.startTime": selectedSlot.startTime,
+      "selectedSlot.endTime": selectedSlot.endTime,
+      status: "payment_failed",
+      paymentStatus: "failed",
+    });
   }
 
   async getBookingById(bookingId: string): Promise<IBooking | null> {
@@ -47,7 +82,7 @@ class BookingRepository implements IBookingRepository {
     const bookings = await Booking.find({
       tutorId,
       selectedDate,
-      status: { $nin: ["pending", "completed", "cancelled"] },
+      status: { $nin: ["pending", "completed", "cancelled", "payment_failed"] },
     });
 
     return bookings.map((booking) => ({
@@ -77,7 +112,6 @@ class BookingRepository implements IBookingRepository {
       const bookings = await Booking.find({
         tutorId: new mongoose.Types.ObjectId(tutorId),
         status: "confirmed",
-        // status:{$in:["pending","confirmed"]},
         paymentStatus: "paid",
       })
         .populate(
@@ -97,7 +131,7 @@ class BookingRepository implements IBookingRepository {
     bookingId: string,
     sessionStartTime: Date
   ): Promise<IBooking | null> {
-    console.log("start sesssion from repos",bookingId,sessionStartTime)
+    console.log("start sesssion from repos", bookingId, sessionStartTime);
     return await Booking.findByIdAndUpdate(
       bookingId,
       { sessionStartTime, status: "in-progress" },
@@ -128,56 +162,46 @@ class BookingRepository implements IBookingRepository {
     );
   }
 
-
   async cancelBooking(bookingId: string): Promise<IBooking | null> {
     return await Booking.findByIdAndUpdate(
-      bookingId,{
-        status:"cancelled",},
-        {new :true}
+      bookingId,
+      {
+        status: "cancelled",
+      },
+      { new: true }
     );
   }
 
-
   async findById(bookingId: string): Promise<IBooking | null> {
-    return await Booking.findById(bookingId)
+    return await Booking.findById(bookingId);
   }
-
 
   async getPopulatedBooking(bookingId: string): Promise<IBooking | null> {
     return await Booking.findById(bookingId)
-    .populate("userId","_id fullName email phone")
-    .populate("tutorId","_id name email profilePhoto ")
+      .populate("userId", "_id fullName email phone")
+      .populate("tutorId", "_id name email profilePhoto ");
   }
 
-
-
   async getUpcomingSessionsCount(tutorId: string): Promise<number> {
-   return await Booking.countDocuments({
-    tutorId,
-    status:"confirmed"
-   })
- }
+    return await Booking.countDocuments({
+      tutorId,
+      status: "confirmed",
+    });
+  }
 
- async getCompletedSessionsCount(tutorId: string): Promise<number> {
-   return await Booking.countDocuments({
-    tutorId,
-    status:"completed"
-   })
- }
+  async getCompletedSessionsCount(tutorId: string): Promise<number> {
+    return await Booking.countDocuments({
+      tutorId,
+      status: "completed",
+    });
+  }
 
- async getCancelledSesionsCount(tutorId: string): Promise<number> {
-   return await Booking.countDocuments({
-    tutorId,
-    status:"cancelled"
-   })
- }
-
-
-
-
-
-
-
+  async getCancelledSesionsCount(tutorId: string): Promise<number> {
+    return await Booking.countDocuments({
+      tutorId,
+      status: "cancelled",
+    });
+  }
 }
 
 export default BookingRepository;

@@ -76,6 +76,19 @@ class BookingService implements IBookingService {
     }
   }
 
+
+  async updatePaymentStatus(
+    bookingId: string,
+    status: string,
+    failureReason?: string
+  ): Promise<IBooking | null> {
+    try {
+      return await this.bookingRepository.updateBookingPaymentStatus(bookingId, status, failureReason);
+    } catch (error) {
+      throw new Error(`Failed to update payment status: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
   async verifyAndCreditWallet(
     bookingId: string,
     tutorId: string,
@@ -83,6 +96,11 @@ class BookingService implements IBookingService {
     amount: number,
     creditedBy: string
   ): Promise<void> {
+
+
+    try
+    {
+
     if (paymentStatus === "paid") {
       await this.bookingRepository.updateBookingPaymentStatus(
         bookingId,
@@ -98,6 +116,29 @@ class BookingService implements IBookingService {
     } else {
       throw new Error("Payment verification failed");
     }
+  }catch(error){
+    await this.updatePaymentStatus(
+      bookingId, 
+      "failed", 
+      error instanceof Error ? error.message : "Payment verification failed"
+    );
+    throw error;
+  }
+  }
+
+
+
+  async getFailedBooking(userId: string, tutorId: string, selectedDate: Date, selectedSlot: { startTime: string; endTime: string; }): Promise<IBooking | null> {
+    try {
+      return await this.bookingRepository.getFailedBooking(
+          userId,
+          tutorId,
+          selectedDate,
+          selectedSlot
+      );
+  } catch (error) {
+      throw new Error("Failed to check existing booking");
+  }
   }
 
   async startSession(bookingId: string): Promise<IBooking | null> {

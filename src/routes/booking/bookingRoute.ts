@@ -48,4 +48,8 @@ router.put(`/cancel/:bookingId`,authMiddleware,(req,res)=>bookingController.canc
 
 
 router.get(`/dashboard/:tutorId`,authMiddleware,(req,res)=>bookingController.getTutorDashboardStats(req,res))
+
+router.post("/mark-payment-failed", authMiddleware, (req,res)=>bookingController.markPaymentAsFailed(req,res));
+
+
 export default router;

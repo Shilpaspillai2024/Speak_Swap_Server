@@ -17,6 +17,8 @@ interface IBookingService {
 
   getTutorBookings(tutorId: string): Promise<IBooking[]>;
 
+  updatePaymentStatus(bookingId:string,status:string,failureReason?:string):Promise<IBooking | null>
+
   verifyAndCreditWallet(
     bookingId: string,
     tutorId: string,
@@ -25,6 +27,11 @@ interface IBookingService {
     creditedBy: string
   ): Promise<void>;
 
+
+
+    getFailedBooking(userId:string,tutorId:string,selectedDate: Date,
+      selectedSlot: { startTime: string; endTime: string }):Promise<IBooking | null>
+  
 
      startSession(bookingId:string):Promise<IBooking | null>;
 

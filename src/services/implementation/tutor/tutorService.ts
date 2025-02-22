@@ -175,7 +175,7 @@ class TutorService implements ITutorService{
         const certPath = certificate;
         const certResult = await cloudinary.uploader.upload(certPath, {
           folder: "tutor/certificates",
-          resource_type: "raw",
+          resource_type: "auto",
           use_filename: true,
           unique_filename: true,
         });
@@ -361,16 +361,15 @@ class TutorService implements ITutorService{
       const earningsByDate: Record<string, { amount: number; type: string }> = {};
 
       wallet.transactions.forEach((txn) => {
-        const dateKey = txn.date.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-    
+        const dateKey = txn.date.toISOString().split("T")[0]; 
         if (!earningsByDate[dateKey]) {
           earningsByDate[dateKey] = { amount: 0, type: txn.type };
         }
     
         if (txn.type === "credit") {
-          earningsByDate[dateKey].amount += txn.amount; // Add earnings
+          earningsByDate[dateKey].amount += txn.amount; 
         } else if (txn.type === "debit") {
-          earningsByDate[dateKey].amount -= txn.amount; // Subtract debits (refunds)
+          earningsByDate[dateKey].amount -= txn.amount; 
         }
       });
     

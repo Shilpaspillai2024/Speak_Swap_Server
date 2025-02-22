@@ -8,6 +8,7 @@ export interface IBooking extends Document{
     status:'pending' |'confirmed'|'in-progress' | 'completed'|'cancelled';
     sessionFee:number;
     paymentStatus:'paid'| 'pending' | 'failed'|'completed';
+    failureReason?:string;
     bookingDate:Date;
     paymentId?:string;
     orderId?: string;
@@ -37,7 +38,7 @@ const bookingSchema=new Schema<IBooking>({
     }, 
   status: {
      type: String, 
-     enum: ['pending', 'confirmed','in-progress', 'completed','cancelled'], 
+     enum: ['pending', 'confirmed','in-progress', 'completed','cancelled','payment_failed'], 
      default: 'pending'
      },
   sessionFee: { 
@@ -46,9 +47,13 @@ const bookingSchema=new Schema<IBooking>({
     },
   paymentStatus: { 
     type: String, 
-    enum: ['paid', 'pending', 'failed','completed'], 
+    enum: ['paid', 'pending', 'failed'], 
     default: 'pending'
  },
+
+ failureReason: {
+  type: String
+},
   bookingDate: { 
     type: Date, 
     default: Date.now 
@@ -69,8 +74,6 @@ sessionEndTime:{
 duration:{
   type:Number,
 }
-
-
 
 },{ timestamps: true });
 

@@ -7,7 +7,7 @@ import { IBookingDTO } from "../../../services/interfaces/booking/ibookingDTO";
 export interface IBookingRepository{
     createBooking(bookingData:IBookingDTO):Promise<IBooking>;
     updateBookingOrderId(bookingId:string,orderId:string): Promise<IBooking | null>
-    updateBookingPaymentStatus(bookingId: string, paymentStatus: string): Promise<IBooking | null>;
+    updateBookingPaymentStatus(bookingId: string, paymentStatus: string,failureReason?:string): Promise<IBooking | null>;
     getBookingById(bookingId:string):Promise<IBooking | null>;
     getBookedSlots(tutorId: string, selectedDate:Date): Promise<{ startTime: string; endTime: string }[]>;
     getBooking(userId:string):Promise<IBooking[] >
@@ -21,6 +21,11 @@ export interface IBookingRepository{
     getUpcomingSessionsCount(tutorId:string):Promise<number>;
     getCompletedSessionsCount(tutorId:string):Promise<number>;
     getCancelledSesionsCount(tutorId:string):Promise<number>;
+
+   
+    getFailedBooking(userId:string,tutorId:string,selectedDate: Date,
+        selectedSlot: { startTime: string; endTime: string }):Promise<IBooking | null>
+    
 }
 
 

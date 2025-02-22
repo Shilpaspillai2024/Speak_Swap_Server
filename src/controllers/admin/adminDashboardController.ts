@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
 import { IDashboardService } from "../../services/interfaces/admin/iadminDashboardService";
+import { HttpStatus } from "../../constants/httpStatus";
+
 
 export default class DashboardController {
     private dashboardService: IDashboardService;
@@ -12,7 +14,7 @@ export default class DashboardController {
     async getDashboardData(req:CustomRequest, res: Response) {
       try {
         const dashboardData = await this.dashboardService.getDashboardData();
-         res.status(200).json({
+         res.status(HttpStatus.OK).json({
           success: true,
           data: dashboardData
         });
@@ -26,7 +28,7 @@ export default class DashboardController {
           errorMessage = error.message;
         }
       
-        res.status(500).json({
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: errorMessage
         });

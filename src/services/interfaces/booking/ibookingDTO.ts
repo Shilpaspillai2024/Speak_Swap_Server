@@ -8,6 +8,7 @@ export interface IBookingDTO {
     sessionFee: number;
     status: "pending" | "confirmed" | "in-progress"|"completed" | "cancelled";
     paymentStatus: "paid" | "pending" | "failed" | "completed";
+    failureReason?:string;
     bookingDate: Date;
     paymentId?: string;
     orderId?: string;
