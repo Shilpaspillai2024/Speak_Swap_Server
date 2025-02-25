@@ -18,6 +18,13 @@ class UserRepository implements IUserRepository{
         return await User.findById(id)
     }
 
+    async updateOnlineStatus(id: string, isOnline: boolean): Promise<void> {
+        await User.findByIdAndUpdate(id,{
+            isOnline,
+            lastActive: new Date()
+        })
+    }
+
 
     async updateUser(id: string, update: Partial<IUser>): Promise<IUser | null> {
         return await User.findByIdAndUpdate(id,update,{new:true})

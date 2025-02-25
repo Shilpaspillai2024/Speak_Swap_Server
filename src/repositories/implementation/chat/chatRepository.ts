@@ -46,7 +46,7 @@ class ChatRepository implements IChatRepository {
     try {
       return await Chat.findById(chatId).populate({
         path: "participants.participantId",
-        select: "name profilePhoto fullName role",
+        select: "name profilePhoto fullName role isOnline lastActive",
       });
     } catch (error: any) {
       throw new Error(`Failed to fetch chat by ID: ${error.message}`);

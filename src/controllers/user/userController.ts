@@ -520,6 +520,37 @@ class UserController {
       }
       }
 
+
+
+       async logoutUser(req:CustomRequest, res: Response): Promise<void> {
+          try {
+
+            const id=req.user
+            if(!id){
+              res.status(400).json({message:"user id is required"})
+              return;
+            }
+
+            await this.userService.logoutUser(id.toString())
+
+           
+            res.clearCookie("userRefreshToken", {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+              path: "/",
+            });
+      
+            res.status(200).json({ message: "Logout successful" });
+          } catch (error) {
+            console.error("Error in logout:", error);
+            res
+              .status(500)
+              .json({ message: "An unexpected error occurred during logout" });
+          }
+        }
+      
+
 }
 
 export default UserController;

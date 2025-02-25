@@ -7,6 +7,7 @@ interface IUserRepository{
     updateUser(id:string,update:Partial<IUser>):Promise<IUser | null>
     getAllUsers():Promise<IUser[]>
     deleteUser(id:string):Promise<IUser | null>
+    updateOnlineStatus(id:string,isOnline:boolean):Promise<void>
 }
 
 export default IUserRepository

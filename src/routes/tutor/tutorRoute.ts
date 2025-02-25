@@ -69,4 +69,6 @@ router.get('/wallet-details', authMiddleware, (req, res) =>
   router.post('/withdraw',authMiddleware,(req,res)=>walletController.withdrawFunds(req,res));
 
   router.get(`/earnings/:tutorId`,authMiddleware,(req,res)=>tutorController.getTutorEarnings(req,res))
+
+  router.post('/logout',(req,res)=>tutorController.logoutTutor(req,res))
 export default router

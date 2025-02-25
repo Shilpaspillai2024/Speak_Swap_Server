@@ -41,4 +41,7 @@ export interface IUserService {
   tutorProfile(tutorId: string): Promise<ITutor | null>;
 
   verifyToken(token: string): string;
+
+
+  logoutUser(id:string):Promise<void>
 }

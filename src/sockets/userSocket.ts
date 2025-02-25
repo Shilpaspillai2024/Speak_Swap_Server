@@ -3,6 +3,13 @@ import { Server ,Socket} from "socket.io";
 
 //socket.io logic
 
+interface MarkReadData {
+  chatId: string;
+  userId: string;
+}
+
+const usersOnline = new Map();
+
 
 const handleChatSocket=(io:Server)=>{
 
@@ -10,7 +17,10 @@ io.on("connection", (socket:Socket) => {
     console.log(`user connected ;${socket.id}`);
     console.log(`Transport used: ${socket.conn.transport.name}`);
   
-   
+    socket.on("userOnline", (userId) => {
+      usersOnline.set(userId, socket.id);
+      io.emit("updateUserStatus", { userId, isOnline: true });
+    });
   
     socket.on("joinRoom", (chatId) => {
       socket.join(chatId);
@@ -18,6 +28,7 @@ io.on("connection", (socket:Socket) => {
       socket.to(chatId).emit("userJoined", { userId: socket.id });
     });
   
+   
   
    
     //handling sending messages
@@ -38,6 +49,36 @@ io.on("connection", (socket:Socket) => {
     });
   
     
+
+
+
+    // handling mark as read
+    socket.on("markAsRead", async (data: MarkReadData, callback) => {
+      try {
+        const { chatId, userId } = data;
+        
+        if (!chatId || !userId) {
+          callback?.({ success: false, message: "Invalid data for marking messages as read." });
+          return;
+        }
+
+        // Emit to all users in the chat that messages were read
+        socket.emit("messagesRead", { chatId, readBy: userId });
+        socket.to(chatId).emit("messagesRead", { chatId, readBy: userId });
+
+        callback?.({ 
+          success: true, 
+          message: "Messages marked as read successfully." 
+        });
+
+      } catch (error) {
+        console.error("Error in markAsRead socket handler:", error);
+        callback?.({ 
+          success: false, 
+          message: "Failed to mark messages as read." 
+        });
+      }
+    });
    
   
     socket.on("initiateCall", ({ chatId,callerName }) => {
@@ -155,6 +196,12 @@ io.on("connection", (socket:Socket) => {
   
     socket.on("disconnect", () => {
       console.log(`user ${socket.id} disconnected`);
+
+       const userId = [...usersOnline.entries()].find(([id, sId]) => sId === socket.id)?.[0];
+    if (userId) {
+      usersOnline.delete(userId);
+      io.emit("updateUserStatus", { userId, isOnline: false });
+    }
     });
   });
 

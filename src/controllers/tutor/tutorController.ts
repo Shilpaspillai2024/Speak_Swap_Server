@@ -447,6 +447,26 @@ class TutorController {
     res.status(500).json({ message: "Server error" });
     }
   }
+
+
+  async logoutTutor(req: Request, res: Response): Promise<void> {
+      try {
+        res.clearCookie("tutorRefreshToken", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+          path: "/",
+        });
+  
+        res.status(200).json({ message: "Logout successful" });
+      } catch (error) {
+        console.error("Error in logout:", error);
+        res
+          .status(500)
+          .json({ message: "An unexpected error occurred during logout" });
+      }
+    }
+  
 }
 
 export default TutorController;

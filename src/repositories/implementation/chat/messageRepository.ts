@@ -1,6 +1,8 @@
 import { IMessage, Message } from "../../../models/chat/messageModel";
 import { IMessageRepository } from "../../interfaces/chat/imessageRepository";
 import { Chat } from "../../../models/chat/chatModel";
+import mongoose from "mongoose";
+import { Types } from 'mongoose';
 
 class MessageRepository implements IMessageRepository {
   async createMessage(
@@ -79,6 +81,8 @@ class MessageRepository implements IMessageRepository {
         { new: true }
       );
 
+      console.log("message result from messsage repo:",result)
+
       if (!result) {
         throw new Error("Failed to update chat unread count");
       }
@@ -86,7 +90,6 @@ class MessageRepository implements IMessageRepository {
       throw new Error(`Failed to mark messages as read: ${error.message}`);
     }
   }
-
  
 }
 

@@ -21,6 +21,8 @@ interface IUser extends Document{
     otpExpiration?:Date;
     isVerified:boolean;
     role: "user" | "tutor";
+    isOnline:boolean;
+    lastActive:Date;
     
 
 }
@@ -101,6 +103,15 @@ const userSchema =new Schema<IUser>({
         enum: ["user", "tutor"],
         default: "user",
       },
+      
+      isOnline: {
+        type: Boolean,
+        default: false
+      },
+      lastActive: {
+        type: Date,
+        default: Date.now
+      }
     
 
 })

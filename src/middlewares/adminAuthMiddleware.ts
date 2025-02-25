@@ -9,7 +9,7 @@ export interface CustomRequest extends Request{
 
 const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunction)=>{
     try {
-        const token=req.header("Authorization")?.replace("Bearer","").trim();
+        const token=req.header("Authorization")?.replace("Bearer ","").trim();
         console.log("Token from header:", token);
         if(!token){
              res.status(401).json({message:"Authentication failed .Token missing",
@@ -22,40 +22,44 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         const decoded=JwtUtils.verifyToken(token)
 
         console.log("Backend Decoded Token Payload:", decoded);
-        if(!decoded){
-        res.status(401).json({message:"Authentication failed .Invalid token",
-                details:"Token verification failed"
-            })
-            return
+        if (!decoded || typeof decoded !== "object") {
+          res.status(401).json({
+            message: "Authentication failed. Invalid token",
+            details: "Token verification failed",
+          });
+          return;
         }
-
-        if (typeof decoded === 'object' && 'email' in decoded && 'role' in decoded) {
-            req.admin = (decoded as { email: string }).email;
-            req.role=(decoded as {role:string}).role;
-
-            if (req.role !== 'admin') {
-                res.status(403).json({
-                  message: "Access denied",
-                  details: "You do not have the required permissions",
-                });
-                return;
-              }
-            next();
-          } else {
-             res.status(401).json({
-              message: "Authentication failed",
-              details: "Invalid token payload"
-            });
-            return
-          }
-
-    } catch (error) {
+    
+        // Extract email and role
+        const { email, role } = decoded as { email: string; role: string };
+    
+        if (!email || !role) {
+          res.status(401).json({
+            message: "Authentication failed",
+            details: "Invalid token payload",
+          });
+          return;
+        }
+    
+        req.admin = email;
+        req.role = role;
+    
+        if (role !== "admin") {
+          res.status(403).json({
+            message: "Access denied",
+            details: "You do not have the required permissions",
+          });
+          return;
+        }
+    
+        next();
+      } catch (error) {
         console.error("Authentication error:", error);
-        res.status(401).json({ message: "Authentication failed.",
-        error: error instanceof Error ? error.message : "Unknown error"
-         });
-        
-    }
-}
-
+        res.status(401).json({
+          message: "Authentication failed.",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    };
+    
 export default  adminAuthentcationMiddleware

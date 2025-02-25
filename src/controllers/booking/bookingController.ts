@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import IBookingService from "../../services/interfaces/booking/ibookingService";
 import { IBookingDTO } from "../../services/interfaces/booking/ibookingDTO";
 import verifyRazorpaySignature from "../../utils/verifyRazorpayUtils";
+import {HttpStatus} from "../../constants/httpStatus"
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -40,12 +41,12 @@ class BookingController {
         !selectedSlot ||
         !sessionFee
       ) {
-        res.status(400).json({ message: "Missing required fields" });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "Missing required fields" });
         return;
       }
 
       if (!selectedSlot.startTime || !selectedSlot.endTime) {
-        res.status(400).json({
+        res.status(HttpStatus.BAD_REQUEST).json({
           success: false,
           message: "Invalid slot format",
         });
@@ -63,7 +64,7 @@ class BookingController {
       );
 
       if (!isSlotAvailable) {
-        res.status(400).json({ message: "Selected slot is already booked" });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "Selected slot is already booked" });
         return;
       }
 
@@ -89,7 +90,7 @@ class BookingController {
         const order = await razorpay.orders.create(options);
         await this.bookingService.updateOrderId(bookingId, order.id);
 
-        res.status(201).json({
+        res.status(HttpStatus.CREATED).json({
           success: true,
           data: {
             savedBooking: existingBooking,
@@ -125,7 +126,7 @@ class BookingController {
       const order = await razorpay.orders.create(options);
       await this.bookingService.updateOrderId(receiptId, order.id);
 
-      res.status(201).json({
+      res.status(HttpStatus.CREATED).json({
         success: true,
         data: {
           savedBooking,
@@ -134,7 +135,7 @@ class BookingController {
       });
     } catch (error) {
       console.error("Error in createBooking:", error);
-      res.status(500).json({
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Error creating booking",
         error: error instanceof Error ? error.message : "Unknown error",
@@ -163,7 +164,7 @@ class BookingController {
       !creditedBy
     ) {
       res
-        .status(400)
+        .status(HttpStatus.BAD_REQUEST)
         .json({ success: false, message: "Missing required fields" });
       return;
     }
@@ -188,7 +189,7 @@ class BookingController {
           "Signature mismatch"
         );
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Payment verification failed" });
         return;
       }
@@ -201,7 +202,7 @@ class BookingController {
         creditedBy
       );
 
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         success: true,
         message: "Payment verified and wallet credited successfully",
         booking: updatedBooking,
@@ -218,7 +219,7 @@ class BookingController {
         console.error("Failed to update payment status:", updateError);
       }
 
-      res.status(500).json({
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Payment verification failed",
         error: error instanceof Error ? error.message : "Unknown error",
@@ -232,7 +233,7 @@ class BookingController {
 
       if (!bookingId) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Booking ID is required" });
         return;
       }
@@ -244,18 +245,18 @@ class BookingController {
       );
 
       if (!updatedBooking) {
-        res.status(404).json({ success: false, message: "Booking not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Booking not found" });
         return;
       }
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .json({ success: true, message: "Payment marked as failed" });
       return;
     } catch (error) {
       console.error("Error marking payment as failed:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal server error" });
     }
   }
@@ -265,13 +266,13 @@ class BookingController {
     try {
       const booking = await this.bookingService.getBookingDetails(bookingId);
       if (!booking) {
-        res.status(404).json({ message: "Booking not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Booking not found" });
         return;
       }
-      res.status(200).json(booking);
+      res.status(HttpStatus.OK).json(booking);
     } catch (error) {
       console.error("Error fetching booking details:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   }
 
@@ -282,7 +283,7 @@ class BookingController {
       const selectedDate = new Date(req.params.selectedDate);
       if (!selectedDate) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Missing selected day" });
         return;
       }
@@ -292,11 +293,11 @@ class BookingController {
         selectedDate
       );
 
-      res.status(200).json({ success: true, data: bookedSlots });
+      res.status(HttpStatus.OK).json({ success: true, data: bookedSlots });
     } catch (error) {
       console.error("Error fetching booked slots:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Error fetching booked slots" });
     }
   }
@@ -307,18 +308,18 @@ class BookingController {
       console.log("userId", userId);
       if (!userId) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Invalid or missing user ID" });
         return;
       }
       const result = await this.bookingService.getUserBookings(userId);
       console.log("result of booings", result);
 
-      res.status(200).json({ success: true, result });
+      res.status(HttpStatus.OK).json({ success: true, result });
     } catch (error) {
       console.error("Error fetching user bookings:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "internal server error" });
     }
   }
@@ -330,18 +331,18 @@ class BookingController {
       console.log("tutorId", tutorId);
       if (!tutorId) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Invalid or missing tutor ID" });
         return;
       }
       const result = await this.bookingService.getTutorBookings(tutorId);
       console.log("result of booings", result);
 
-      res.status(200).json({ success: true, result });
+      res.status(HttpStatus.OK).json({ success: true, result });
     } catch (error) {
       console.error("Error fetching user bookings:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "internal server error" });
     }
   }
@@ -354,13 +355,13 @@ class BookingController {
 
       const booking = await this.bookingService.startSession(bookingId);
       if (!booking) {
-        res.status(404).json({ message: "Booking not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Booking not found" });
         return;
       }
-      res.status(200).json({ message: "Session started", booking });
+      res.status(HttpStatus.OK).json({ message: "Session started", booking });
       return;
     } catch (error) {
-      res.status(500).json({ message: "Error starting session", error });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error starting session", error });
       return;
     }
   }
@@ -371,13 +372,13 @@ class BookingController {
 
       const booking = await this.bookingService.completeSession(bookingId);
       if (!booking) {
-        res.status(404).json({ message: "Booking not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Booking not found" });
         return;
       }
-      res.status(200).json({ message: "Session completed", booking });
+      res.status(HttpStatus.OK).json({ message: "Session completed", booking });
       return;
     } catch (error) {
-      res.status(500).json({ message: "Error completeting session", error });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error completeting session", error });
       return;
     }
   }
@@ -390,7 +391,7 @@ class BookingController {
       const tutorId = req.user;
 
       if (!tutorId) {
-        res.status(403).json({ message: "Unauthorized" });
+        res.status(HttpStatus.FORBIDDEN).json({ message: "Unauthorized" });
         return;
       }
 
@@ -399,12 +400,12 @@ class BookingController {
         bookingId
       );
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .json({ message: "Session cancelled successfully", result });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to cancel session";
-      res.status(400).json({ message: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ message: errorMessage });
     }
   }
 
@@ -415,10 +416,10 @@ class BookingController {
     try {
       const { tutorId } = req.params;
       const stats = await this.bookingService.getTutorSessionStatics(tutorId);
-      res.status(200).json(stats);
+      res.status(HttpStatus.OK).json(stats);
     } catch (error) {
       console.error("Error fetching tutor dashboard stats:", error);
-      res.status(500).json({ message: "Server Error" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Server Error" });
     }
   }
 }

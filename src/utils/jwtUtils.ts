@@ -22,12 +22,13 @@ class JwtUtils{
         const secret=isRefreshToken ? refreshSecret :accessSecret;
        
         const decoded= jwt.verify(token,secret)
-        return decoded;
+        return decoded as JwtPayload;
         
        } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
             console.error("Token has expired");
-            return { message: "Token expired" }; 
+           
+            return null;
           } else if (error instanceof jwt.JsonWebTokenError) {
             console.error("Invalid token signature");
           }

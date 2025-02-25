@@ -213,6 +213,8 @@ class UserService implements IUserService {
       return { user: null, message: "Invalid Password" };
     }
 
+           await this.userRepository.updateOnlineStatus(user._id.toString(),true)
+
     return { user: user, message: " User is Authenticated" };
   }
 
@@ -320,6 +322,11 @@ class UserService implements IUserService {
 
   async tutorProfile(tutorId: string): Promise<ITutor | null> {
     return await this.tutorRepository.findTutorById(tutorId);
+  }
+
+
+  async logoutUser(id: string): Promise<void> {
+    await this.userRepository.updateOnlineStatus(id,false)
   }
 }
 
