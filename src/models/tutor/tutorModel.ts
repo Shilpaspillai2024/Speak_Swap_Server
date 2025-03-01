@@ -104,7 +104,7 @@ const tutorSchema = new Schema<ITutor>(
 
     hourlyRate:{
       type:Number,
-      default:10  // Fixed $10/hour base rate
+      default:300  // in indian Fixed $10/hour base rate
     }
   },
   { timestamps: true }

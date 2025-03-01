@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import JwtUtils from "../utils/jwtUtils";
+import { HttpStatus } from "../constants/httpStatus";
 
 export interface CustomRequest extends Request {
   user?: string;
@@ -11,7 +12,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     const token = req.header("Authorization")?.replace("Bearer ", "").trim();
 
     if (!token) {
-      res.status(401).json({
+      res.status(HttpStatus.UNAUTHORIZED).json({
         message: "Authentication failed. Token missing.",
         details: "No authorization header found.",
       });
@@ -20,7 +21,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
 
     const decoded = JwtUtils.verifyToken(token);
     if (!decoded || typeof decoded !== "object") {
-      res.status(401).json({
+      res.status(HttpStatus.UNAUTHORIZED).json({
         message: "Authentication failed. Invalid token.",
         details: "Token verification failed.",
       });
@@ -31,7 +32,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     const { role } = decoded as { role?: string };
 
     if (!role) {
-      res.status(403).json({
+      res.status(HttpStatus.FORBIDDEN).json({
         message: "Access denied.",
         details: "Role information missing from the token.",
       });
@@ -44,7 +45,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     } else if ("tutorId" in decoded) {
       req.user = (decoded as { tutorId: string }).tutorId;
     } else {
-      res.status(401).json({
+      res.status(HttpStatus.UNAUTHORIZED).json({
         message: "Authentication failed.",
         details: "Invalid token payload. Missing userId or tutorId.",
       });
@@ -55,7 +56,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     next(); 
   } catch (error) {
     console.error("Authentication error:", error);
-    res.status(401).json({
+    res.status(HttpStatus.UNAUTHORIZED).json({
       message: "Authentication failed.",
       error: error instanceof Error ? error.message : "Unknown error",
     });

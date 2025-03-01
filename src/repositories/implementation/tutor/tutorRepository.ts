@@ -1,5 +1,4 @@
 import { Tutor } from "../../../models/tutor/tutorModel";
-import { IWallet } from "../../../models/tutor/walletModel";
 import { ITutor, IAvailability } from "../../../types/ITutor";
 import ITutorRepository from "../../interfaces/tutor/itutorRepository";
 
@@ -76,10 +75,33 @@ class TutorRepository implements ITutorRepository {
     return tutor.availability;
   }
 
-  async getAllTutors(): Promise<ITutor[]> {
-    return await Tutor.find();
-  }
+  
 
+  async searchTutors(searchQuery: string,page:number=1,limit:number=9): Promise<{tutors:ITutor[],total:number}> {
+    
+    const skip=(page-1)*limit;
+   
+    const query: { isActive: boolean; $or?: { [key: string]: { $regex: RegExp } }[] } = {
+      isActive: true,
+    };
+  
+    if (searchQuery) {
+      const regex = new RegExp(searchQuery, "i");
+      query.$or = [
+        { name: { $regex: regex } },
+        { teachLanguage: { $regex: regex } },
+        { country: { $regex: regex } },
+      ];
+    }
+
+
+    const [tutors, total] = await Promise.all([
+      Tutor.find(query).skip(skip).limit(limit),
+      Tutor.countDocuments(query)
+    ]);
+    
+    return { tutors, total };
+  }
 
   
 }

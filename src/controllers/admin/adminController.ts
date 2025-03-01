@@ -219,6 +219,27 @@ class AdminController {
     }
   }
 
+
+  async pendingTutorsDetails(req: CustomRequest, res: Response): Promise<void> {
+    try {
+      if (!req.admin) {
+        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        return;
+      }
+      const {tutorId}=req.params
+      const pendingTutor=await this.adminService.getTutorPendingTutorById(tutorId)
+      res
+        .status(HttpStatus.OK)
+        .json({
+          message: "pending tutor fetched successfully",
+          tutors: pendingTutor,
+        });
+    } catch (error) {
+      console.error("Error fetching pending tutors:", error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch pending tutors" });
+    }
+  }
+
   async tutorVerify(req: CustomRequest, res: Response): Promise<void> {
     try {
       const { tutorId } = req.params;

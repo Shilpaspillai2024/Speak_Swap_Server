@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import JwtUtils from "../../utils/jwtUtils";
 import { CustomRequest } from "../../middlewares/authMiddleware";
 import { IUserService } from "../../services/interfaces/user/iuserService";
+import { HttpStatus } from "../../constants/httpStatus";
 
 class UserController {
   private userService: IUserService;
@@ -23,7 +24,7 @@ class UserController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -31,11 +32,11 @@ class UserController {
     try {
       const { token } = req.body;
       if (!token) {
-        res.status(400).json({ error: "Token is requied" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Token is requied" });
         return;
       }
       const response = await this.userService.sendOtp(token);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
@@ -50,20 +51,20 @@ class UserController {
       const { token, otp } = req.body;
 
       if (!token || !otp) {
-        res.status(400).json({ error: "Token and OTP are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Token and OTP are required" });
         return;
       }
 
       const userId = this.userService.verifyToken(token);
       const message = await this.userService.verifyOtp(userId, otp);
 
-      res.status(200).json({ message });
+      res.status(HttpStatus.OK).json({ message });
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -72,7 +73,7 @@ class UserController {
       const { token, password, confirmPassword } = req.body;
 
       if (password !== confirmPassword) {
-        res.status(400).json({ error: "Password do not match" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Password do not match" });
         return;
       }
 
@@ -80,18 +81,18 @@ class UserController {
 
       if (!userId) {
         console.error("Invalid or expired token");
-        res.status(400).json({ error: "Invalid or expired token" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid or expired token" });
         return;
       }
 
       const result = await this.userService.setPassword(userId, password);
-      res.status(200).json({ message: "Password Set Successfully", result });
+      res.status(HttpStatus.OK).json({ message: "Password Set Successfully", result });
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -107,7 +108,7 @@ class UserController {
       } = req.body;
 
       if (!token || !country || !nativeLanguage || !learnLanguage) {
-        res.status(400).json({ error: "All fields are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "All fields are required" });
         return;
       }
 
@@ -123,14 +124,14 @@ class UserController {
       });
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .json({ message: "Profile updated successfully", updatedUser });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -139,7 +140,7 @@ class UserController {
       const { token, talkAbout, learningGoal, whyChat } = req.body;
 
       if (!token || !talkAbout || !learningGoal || !whyChat) {
-        res.status(400).json({ error: "All fields are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "All fields are required" });
         return;
       }
 
@@ -151,14 +152,14 @@ class UserController {
       });
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .json({ message: "user interest added successfully", updatedUser });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -166,25 +167,25 @@ class UserController {
     try {
       const { token } = req.body;
       if (!token || !req.file) {
-        res.status(400).json({ error: "Token and file are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Token and file are required" });
         return;
       }
 
       const userId = this.userService.verifyToken(token);
       if (!userId) {
-        res.status(400).json({ error: "Invalid token" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid token" });
         return;
       }
       const filePath = req.file?.path;
       if (!filePath) {
-        res.status(400).json({ error: "File path is missing" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "File path is missing" });
         return;
       }
       const updateUser = await this.userService.uploadProfilePicture(
         userId,
         filePath
       );
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "profile picture uploaded successfully",
         profilePhoto: updateUser.profilePhoto,
       });
@@ -193,7 +194,7 @@ class UserController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -214,20 +215,20 @@ class UserController {
       if (!user) {
        
         if (message === "No user is registered with this email") {
-          res.status(404).json({ message });
+          res.status(HttpStatus.NOT_FOUND).json({ message });
           return;
         }
 
         if (message === "Invalid password") {
-          res.status(401).json({message});
+          res.status(HttpStatus.UNAUTHORIZED).json({message});
           return;
         }
         if(message ==="Your account is blocked"){
-          res.status(403).json({message})
+          res.status(HttpStatus.FORBIDDEN).json({message})
           return
         }
 
-        res.status(400).json({ message: "Authentication failed" });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "Authentication failed" });
         return;
       }
 
@@ -245,7 +246,7 @@ class UserController {
         maxAge: 1 * 60 * 60 * 1000, 
       });
 
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "Login Successfull",
         accessToken,
         user,
@@ -257,7 +258,7 @@ class UserController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(500).json({ error: errorMessage });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
 
@@ -270,7 +271,7 @@ class UserController {
         console.log("Cookies:", req.cookies);
         
         if(!refreshToken){
-            res.status(401).json({message:"Refresh token missing"});
+            res.status(HttpStatus.UNAUTHORIZED).json({message:"Refresh token missing"});
             return;
         }
 
@@ -279,7 +280,7 @@ class UserController {
 
       
         if(!decoded){
-            res.status(401).json({message:"Invalid Refresh token"});
+            res.status(HttpStatus.UNAUTHORIZED).json({message:"Invalid Refresh token"});
             return;
 
         }
@@ -295,10 +296,10 @@ class UserController {
        
         console.log("new AccessToken refreshed:",newAccessToken)
     
-        res.status(200).json({accessToken:newAccessToken})
+        res.status(HttpStatus.OK).json({accessToken:newAccessToken})
     } catch (error) {
         console.error("Error in token refresh:",error);
-        res.status(500).json({message:"An unexpected error occured"})
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:"An unexpected error occured"})
 
 
         
@@ -312,18 +313,18 @@ class UserController {
     try {
       const { email } = req.body;
       if (!email) {
-        res.status(400).json({ error: "Email is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email is required" });
         return;
       }
 
       const response = await this.userService.sendForgotPasswordOtp(email);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -332,18 +333,18 @@ class UserController {
     try {
       const { email, otp } = req.body;
       if (!email || !otp) {
-        res.status(400).json({ error: "Email and OTP are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email and OTP are required" });
         return;
       }
 
       const message = await this.userService.verifyForgotPassword(email, otp);
-      res.status(200).json({ message });
+      res.status(HttpStatus.OK).json({ message });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -353,23 +354,23 @@ class UserController {
       const { email, newPassword, confirmPassword } = req.body;
 
       if (!email) {
-        res.status(400).json({ error: "Email is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email is required" });
         return;
       }
 
       if (newPassword !== confirmPassword) {
-        res.status(400).json({ error: "Passwords do not match" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Passwords do not match" });
         return;
       }
 
       const user = await this.userService.resetPassword(email, newPassword);
-      res.status(200).json({ message: "Password reset successfully", user });
+      res.status(HttpStatus.OK).json({ message: "Password reset successfully", user });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -381,15 +382,28 @@ class UserController {
       const loggedInUser=req.user;
      
       if(!loggedInUser){
-        res.status(401).json({message:"authentication failed"})
+        res.status(HttpStatus.UNAUTHORIZED).json({message:"authentication failed"})
         return;
       }
-      const allusers=await this.userService.getAllUsers();
-      const users=allusers.filter(user=>user.id !==loggedInUser && user.isActive)
-      res.status(200).json(users)
+
+      const page=parseInt(req.query.page as string) || 1;
+      const limit=parseInt(req.query.limit as string) || 6;
+
+     
+
+      const searchQuery=(req.query.search as string) || "";
+
+
+      const users=await this.userService.getAllUsers(
+        page,
+        limit,
+        loggedInUser,
+        searchQuery
+      )
+      res.status(HttpStatus.OK).json(users)
       
     } catch (error) {
-      res.status(500).json({message:"fetch user details error"})
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:"fetch user details error"})
       
     }
   }
@@ -401,20 +415,20 @@ class UserController {
       const {id}=req.params;
 
       if(!id){
-        res.status(400).json({message:"user id is required"})
+        res.status(HttpStatus.BAD_REQUEST).json({message:"user id is required"})
         return;
       }
 
       const user=await this.userService.getUser(id)
 
       if (!user) {
-        res.status(404).json({ message: "User not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "User not found." });
         return;
       }
-      res.status(200).json(user);
+      res.status(HttpStatus.OK).json(user);
       
     } catch (error) {
-      res.status(500).json({ message: "Internal server error." });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error." });
     }
   }
 
@@ -424,21 +438,21 @@ class UserController {
 
       const userId=req.user
       if (!userId) {
-        res.status(400).json({ message: "User ID is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "User ID is required" });
         return;
       }
   
       const user = await this.userService.getLoggedUser(userId);
   
       if (!user) {
-        res.status(404).json({ message: "User not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "User not found." });
         return;
       }
   
-      res.status(200).json(user);
+      res.status(HttpStatus.OK).json(user);
       
     } catch (error) {
-      res.status(500).json({ message: "Internal server error." });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error." });
     }
   }
 
@@ -451,7 +465,7 @@ class UserController {
       const userId=req.user;
       
       if (!userId) {
-        res.status(400).json({ success: false, message: 'User ID is required' });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: 'User ID is required' });
         return;
       }
       
@@ -462,14 +476,14 @@ class UserController {
       const updatedUser=await this.userService.updateUser(userId,updateData)
 
       if (!updatedUser) {
-        res.status(404).json({ success: false, message: 'User not found' });
+        res.status(HttpStatus.NOT_FOUND).json({ success: false, message: 'User not found' });
         return;
       }
 
-      res.status(200).json({ success: true, message: 'User updated successfully', data: updatedUser });
+      res.status(HttpStatus.OK).json({ success: true, message: 'User updated successfully', data: updatedUser });
 
     } catch (error:any) {
-      res.status(500).json({ success: false, message: error.message || 'An error occurred' });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message || 'An error occurred' });
     }
   }
 
@@ -481,15 +495,33 @@ class UserController {
    async listTutorsForUser(req:CustomRequest,res:Response):Promise<void>{
       
     try {
-      const tutors=await this.userService.listTutorsForUser();
 
-      console.log("fetched tutors:",tutors)
-      res.status(200).json(tutors)
+      const searchQuery=req.query.search as string || '';
+      const page=parseInt(req.query.page as string) || 1;
+
+      const limit=parseInt(req.query.limit as string) || 9;
+      const result=await this.userService.listTutorsForUser(searchQuery,page,limit);
+
+      console.log("fetched tutors:",result)
+      //res.status(HttpStatus.OK).json(tutors)
       
+
+
+      res.status(HttpStatus.OK).json({
+        tutors:result.tutors,
+      
+        meta: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: result.total,
+          totalPages: Math.ceil(result.total / limit)
+        }
+      
+      })
     } catch (error:any) {
  
       console.error('Error fetching tutors:', error); 
-      res.status(500).json({ message: 'Failed to fetch tutors', error: error.message });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch tutors', error: error.message });
     }
     }
 
@@ -501,22 +533,22 @@ class UserController {
         const {tutorId}=req.params;
 
       if(!tutorId){
-        res.status(400).json({message:"tutor id is required"})
+        res.status(HttpStatus.BAD_REQUEST).json({message:"tutor id is required"})
         return;
       }
 
       const tutor=await this.userService.tutorProfile(tutorId)
 
       if (!tutor) {
-        res.status(404).json({ message: "tutor not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "tutor not found." });
         return;
       }
-      res.status(200).json(tutor);
+      res.status(HttpStatus.OK).json(tutor);
         
         
       } catch (error:any) {
         console.error('Error fetching tutor:', error); 
-        res.status(500).json({ message: 'Failed to fetch tutor', error: error.message });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch tutor', error: error.message });
       }
       }
 
@@ -527,7 +559,7 @@ class UserController {
 
             const id=req.user
             if(!id){
-              res.status(400).json({message:"user id is required"})
+              res.status(HttpStatus.BAD_REQUEST).json({message:"user id is required"})
               return;
             }
 
@@ -541,11 +573,11 @@ class UserController {
               path: "/",
             });
       
-            res.status(200).json({ message: "Logout successful" });
+            res.status(HttpStatus.OK).json({ message: "Logout successful" });
           } catch (error) {
             console.error("Error in logout:", error);
             res
-              .status(500)
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .json({ message: "An unexpected error occurred during logout" });
           }
         }

@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
-import IGeoService from "../../services/interfaces/user/igeoService";
+import IGeoService from "../../services/interfaces/geo/igeoService";
+import {HttpStatus} from '../../constants/httpStatus'
 
 class GeoController{
     private geoService:IGeoService;
@@ -15,7 +16,7 @@ class GeoController{
         try {
 
             const countries=await this.geoService.getCountries()
-            res.status(200).json(countries)
+            res.status(HttpStatus.OK).json(countries)
             
         } catch (error) {
 
@@ -23,7 +24,7 @@ class GeoController{
             if (error instanceof Error) {
               errorMessage = error.message;
             }
-            res.status(400).json({ error: errorMessage });
+            res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
           }
             
         }
@@ -35,7 +36,7 @@ class GeoController{
             try {
     
                 const languages=await this.geoService.getLanguages()
-                res.status(200).json(languages)
+                res.status(HttpStatus.OK).json(languages)
                 
             } catch (error) {
     
@@ -43,7 +44,7 @@ class GeoController{
                 if (error instanceof Error) {
                   errorMessage = error.message;
                 }
-                res.status(400).json({ error: errorMessage });
+                res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
               }
                 
             }

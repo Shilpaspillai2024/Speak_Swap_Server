@@ -2,6 +2,7 @@ import { IBookingRepository } from "../../interfaces/booking/ibookingRepository"
 import Booking from "../../../models/booking/bookingModel";
 import { IBookingDTO } from "../../../services/interfaces/booking/ibookingDTO";
 import { IBooking } from "../../../models/booking/bookingModel";
+
 import mongoose from "mongoose";
 
 class BookingRepository implements IBookingRepository {
@@ -28,8 +29,6 @@ class BookingRepository implements IBookingRepository {
     paymentStatus: string,
     failureReason?: string
   ): Promise<IBooking | null> {
-    
-
     interface BookingStatusUpdate {
       paymentStatus: string;
       status: string;
@@ -91,17 +90,52 @@ class BookingRepository implements IBookingRepository {
     }));
   }
 
-  async getBooking(userId: string): Promise<IBooking[]> {
+  async getBooking(
+    userId: string,
+    page = 1,
+    limit = 5
+  ): Promise<{
+    bookings: IBooking[];
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
     try {
+
+
+      const skip=(page-1)*limit;
+
+      const totalItems=await Booking.countDocuments({
+        userId: new mongoose.Types.ObjectId(userId),
+        $or: [
+          { status: "confirmed", paymentStatus: "paid" },
+          { status: "payment_failed", paymentStatus: "failed" },
+        ],
+      })
+
       const bookings = await Booking.find({
         userId: new mongoose.Types.ObjectId(userId),
-        status: "confirmed",
-        paymentStatus: "paid",
+        $or: [
+          { status: "confirmed", paymentStatus: "paid" },
+          { status: "payment_failed", paymentStatus: "failed" },
+        ],
       })
         .populate("tutorId", "_id name email profilePhoto timeZone")
         .populate("userId", "_id fullName email")
-        .sort({ bookingDate: -1 });
-      return bookings;
+        .sort({ bookingDate: -1 })
+        .skip(skip)
+        .limit(limit);
+        
+      const totalPages = Math.ceil(totalItems / limit);
+      
+      return {
+        bookings,
+        totalItems,
+        currentPage: page,
+        totalPages
+      };
+
+      
     } catch (error) {
       throw new Error("Failed to fetch bookings");
     }

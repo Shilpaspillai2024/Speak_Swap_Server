@@ -1,6 +1,13 @@
 import { User,IUser } from "../../../models/user/userModel";
 import IUserRepository from "../../interfaces/user/iuserRepository";
 
+interface IUserFilter {
+    _id?: { $ne?: string } | string;
+    isActive?: boolean;
+    nativeLanguage?: { $regex?: string, $options?: string } | string;
+   
+  }
+
 class UserRepository implements IUserRepository{
 
 
@@ -30,8 +37,28 @@ class UserRepository implements IUserRepository{
         return await User.findByIdAndUpdate(id,update,{new:true})
     }
 
-    async getAllUsers(): Promise<IUser[]> {
-        return await User.find()
+   
+    async getAllUsers(page: number=1, limit: number=6, loggedInUserId: string,searchQuery:string=""): Promise<IUser[]> {
+        
+        const skip=(page-1)* limit;
+      
+
+        const filter:IUserFilter = {
+            _id: { $ne: loggedInUserId },
+            isActive: true
+          };
+
+      if(searchQuery && searchQuery.trim()){
+              filter.nativeLanguage = {$regex:searchQuery,$options:'i'};
+      }
+
+      
+
+        return await User.find(filter)
+        .skip(skip)
+        .limit(limit)
+        .sort({createdAt:-1,_id:-1})
+        .exec();
     }
 
     async deleteUser(id: string): Promise<IUser | null> {

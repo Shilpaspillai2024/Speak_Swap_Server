@@ -17,6 +17,10 @@ const tutorRepository=new TutorRepository()
 const walletRepository = new WalletRepository();
 
 
+
+
+
+
 const tutorService=new TutorService(tutorRepository,walletRepository)
 const tutorController=new TutorController(tutorService)
 

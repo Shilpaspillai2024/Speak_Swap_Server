@@ -10,6 +10,7 @@ import tutorRoute from "./routes/tutor/tutorRoute";
 import chatRoute from "./routes/chat/chatRoute";
 import messageRoute from "./routes/chat/messageRoute";
 import bookingRoute from "./routes/booking/bookingRoute";
+import geoRoute from "./routes/geo/geoRoute";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import logger from "./middlewares/logger";
@@ -57,6 +58,8 @@ app.use(
 app.use("/admin", adminRoute);
 app.use("/", userRoute);
 app.use("/tutor", tutorRoute);
+
+app.use("/geo",geoRoute);
 
 app.use("/chat", chatRoute);
 app.use("/message", messageRoute);

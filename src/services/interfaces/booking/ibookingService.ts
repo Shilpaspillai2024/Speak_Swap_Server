@@ -13,7 +13,12 @@ interface IBookingService {
     selectedDate:Date
   ): Promise<{ startTime: string; endTime: string }[]>;
 
-  getUserBookings(userId: string): Promise<IBooking[]>;
+  getUserBookings(userId: string,page:number,limit:number): Promise<{
+    bookings:IBooking[],
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
 
   getTutorBookings(tutorId: string): Promise<IBooking[]>;
 

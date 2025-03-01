@@ -14,6 +14,7 @@ interface IAdminService{
     updateTutorStatus(tutorId:string,isActive:boolean):Promise<ITutor | null>
     getAllBookings():Promise<IBooking[]>
     getBookingDetails(bookingId:string):Promise<IBooking | null>
+    getTutorPendingTutorById(tutorId:string):Promise<ITutor | null>
 }
 
 export default IAdminService;

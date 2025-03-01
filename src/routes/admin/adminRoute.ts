@@ -43,6 +43,8 @@ router.get('/tutors/alltutors',adminAuthenticationMiddleware,(req,res)=>adminCon
 
 router.get('/tutors/pending-tutors',adminAuthenticationMiddleware,(req,res)=>adminController.getPendingTutors(req,res))
 
+router.get('/tutors/pending-tutor-details/:tutorId',adminAuthenticationMiddleware,(req,res)=>adminController.pendingTutorsDetails(req,res))
+
 router.patch('/tutors/verify/:tutorId/status',adminAuthenticationMiddleware,(req,res)=>adminController.tutorVerify(req,res))
 
 router.patch('/tutors/:tutorId',adminAuthenticationMiddleware,(req,res)=>adminController.blockUnblockTutor(req,res))

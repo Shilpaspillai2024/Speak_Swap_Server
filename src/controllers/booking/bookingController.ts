@@ -83,7 +83,7 @@ class BookingController {
 
         const options = {
           amount: sessionFee * 100,
-          currency: "USD",
+          currency: "INR", //"USD"
           receipt: bookingId,
         };
 
@@ -119,7 +119,7 @@ class BookingController {
 
       const options = {
         amount: sessionFee * 100,
-        currency: "USD",
+        currency: "INR",  //"USD"
         receipt: receiptId,
       };
 
@@ -312,7 +312,11 @@ class BookingController {
           .json({ success: false, message: "Invalid or missing user ID" });
         return;
       }
-      const result = await this.bookingService.getUserBookings(userId);
+
+
+      const page=parseInt(req.query.page as string) || 1;
+      const limit=parseInt(req.query.limit as string) || 5;
+      const result = await this.bookingService.getUserBookings(userId,page,limit);
       console.log("result of booings", result);
 
       res.status(HttpStatus.OK).json({ success: true, result });

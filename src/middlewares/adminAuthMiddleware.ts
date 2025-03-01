@@ -1,5 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 import JwtUtils  from "../utils/jwtUtils";
+import { HttpStatus } from "../constants/httpStatus";
 
 export interface CustomRequest extends Request{
     admin?:string;
@@ -12,7 +13,7 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         const token=req.header("Authorization")?.replace("Bearer ","").trim();
         console.log("Token from header:", token);
         if(!token){
-             res.status(401).json({message:"Authentication failed .Token missing",
+             res.status(HttpStatus.UNAUTHORIZED).json({message:"Authentication failed .Token missing",
                 details:"No authorization header found"
              })
              return
@@ -23,7 +24,7 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
 
         console.log("Backend Decoded Token Payload:", decoded);
         if (!decoded || typeof decoded !== "object") {
-          res.status(401).json({
+          res.status(HttpStatus.UNAUTHORIZED).json({
             message: "Authentication failed. Invalid token",
             details: "Token verification failed",
           });
@@ -34,7 +35,7 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         const { email, role } = decoded as { email: string; role: string };
     
         if (!email || !role) {
-          res.status(401).json({
+          res.status(HttpStatus.UNAUTHORIZED).json({
             message: "Authentication failed",
             details: "Invalid token payload",
           });
@@ -45,7 +46,7 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         req.role = role;
     
         if (role !== "admin") {
-          res.status(403).json({
+          res.status(HttpStatus.FORBIDDEN).json({
             message: "Access denied",
             details: "You do not have the required permissions",
           });
@@ -55,7 +56,7 @@ const adminAuthentcationMiddleware=(req:CustomRequest,res:Response,next:NextFunc
         next();
       } catch (error) {
         console.error("Authentication error:", error);
-        res.status(401).json({
+        res.status(HttpStatus.UNAUTHORIZED).json({
           message: "Authentication failed.",
           error: error instanceof Error ? error.message : "Unknown error",
         });

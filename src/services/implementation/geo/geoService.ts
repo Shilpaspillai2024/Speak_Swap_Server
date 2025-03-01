@@ -1,6 +1,6 @@
 import axios from "axios";
 import dotenv, { config } from 'dotenv'
-import IGeoService from "../../interfaces/user/igeoService";
+import IGeoService from "../../interfaces/geo/igeoService";
 
 dotenv.config()
 

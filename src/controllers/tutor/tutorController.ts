@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import JwtUtils from "../../utils/jwtUtils";
 import { CustomRequest } from "../../middlewares/authMiddleware";
 import ITutorService from "../../services/interfaces/tutor/itutorService";
+import { HttpStatus } from "../../constants/httpStatus";
 
 class TutorController {
   private tutorService: ITutorService;
@@ -16,14 +17,14 @@ class TutorController {
         req.body
       );
       res
-        .status(201)
+        .status(HttpStatus.CREATED)
         .json({ message: "Tutor registered successfully", tutor, token });
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -31,17 +32,17 @@ class TutorController {
     try {
       const { token } = req.body;
       if (!token) {
-        res.status(400).json({ error: "Token is requied" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Token is requied" });
         return;
       }
       const response = await this.tutorService.sendOtp(token);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -50,20 +51,20 @@ class TutorController {
       const { token, otp } = req.body;
 
       if (!token || !otp) {
-        res.status(400).json({ error: "Token and OTP are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Token and OTP are required" });
         return;
       }
 
       const tutorId = this.tutorService.verifyToken(token);
       const message = await this.tutorService.verifyOtp(tutorId, otp);
 
-      res.status(200).json({ message });
+      res.status(HttpStatus.OK).json({ message });
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -72,7 +73,7 @@ class TutorController {
       const { token, password, confirmPassword } = req.body;
 
       if (password !== confirmPassword) {
-        res.status(400).json({ error: "Password do not match" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Password do not match" });
         return;
       }
 
@@ -80,18 +81,18 @@ class TutorController {
 
       if (!tutorId) {
         console.error("Invalid or expired token");
-        res.status(400).json({ error: "Invalid or expired token" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid or expired token" });
         return;
       }
 
       const result = await this.tutorService.setPassword(tutorId, password);
-      res.status(200).json({ message: "Password Set Successfully", result });
+      res.status(HttpStatus.OK).json({ message: "Password Set Successfully", result });
     } catch (error) {
       let errorMessage = "an unexpected error occured";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -109,7 +110,7 @@ class TutorController {
         !knownLanguages ||
         !teachLanguage
       ) {
-        res.status(400).json({ error: "All fields are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "All fields are required" });
         return;
       }
 
@@ -141,7 +142,7 @@ class TutorController {
         uploadedFiles
       );
 
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "Profile updated successfully",
         updatedTutor,
       });
@@ -150,7 +151,7 @@ class TutorController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -167,16 +168,16 @@ class TutorController {
 
       if (!tutor) {
         if (message === "No tutor is registered with this email") {
-          res.status(404).json({ message });
+          res.status(HttpStatus.NOT_FOUND).json({ message });
           return;
         }
 
         if (message === "Invalid password") {
-          res.status(401).json({ message });
+          res.status(HttpStatus.UNAUTHORIZED).json({ message });
           return;
         }
         if (message === "Your account is blocked") {
-          res.status(403).json({ message });
+          res.status(HttpStatus.FORBIDDEN).json({ message });
           return;
         }
 
@@ -186,7 +187,7 @@ class TutorController {
           message ===
             "Your account has been rejected. Please contact support for assistance."
         ) {
-          res.status(403).json({ message });
+          res.status(HttpStatus.FORBIDDEN).json({ message });
           return;
         }
       }
@@ -202,7 +203,7 @@ class TutorController {
         maxAge: 1 * 60 * 60 * 1000, // 1hr
       });
 
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "Welcome to the tutors Dashboard",
         accessToken,
         tutor,
@@ -212,7 +213,7 @@ class TutorController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -222,14 +223,14 @@ class TutorController {
       const refreshToken = req.cookies.tutorRefreshToken;
 
       if (!refreshToken) {
-        res.status(401).json({ message: "Refresh token missing" });
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: "Refresh token missing" });
         return;
       }
 
       const decoded = JwtUtils.verifyToken(refreshToken, true);
 
       if (!decoded) {
-        res.status(401).json({ message: "Invalid Refresh token" });
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: "Invalid Refresh token" });
         return;
       }
 
@@ -242,10 +243,10 @@ class TutorController {
 
       console.log("new AccessToken refreshed:", newAccessToken);
 
-      res.status(200).json({ accessToken: newAccessToken });
+      res.status(HttpStatus.OK).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error in token refresh:", error);
-      res.status(500).json({ message: "An unexpected error occured" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occured" });
     }
   }
 
@@ -253,18 +254,18 @@ class TutorController {
     try {
       const { email } = req.body;
       if (!email) {
-        res.status(400).json({ error: "Email is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email is required" });
         return;
       }
 
       const response = await this.tutorService.sendForgotPasswordOtp(email);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -273,18 +274,18 @@ class TutorController {
     try {
       const { email, otp } = req.body;
       if (!email || !otp) {
-        res.status(400).json({ error: "Email and OTP are required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email and OTP are required" });
         return;
       }
 
       const message = await this.tutorService.verifyForgotPassword(email, otp);
-      res.status(200).json({ message });
+      res.status(HttpStatus.OK).json({ message });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -294,23 +295,23 @@ class TutorController {
       const { email, newPassword, confirmPassword } = req.body;
 
       if (!email) {
-        res.status(400).json({ error: "Email is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Email is required" });
         return;
       }
 
       if (newPassword !== confirmPassword) {
-        res.status(400).json({ error: "Passwords do not match" });
+        res.status(HttpStatus.BAD_REQUEST).json({ error: "Passwords do not match" });
         return;
       }
 
       const user = await this.tutorService.resetPassword(email, newPassword);
-      res.status(200).json({ message: "Password reset successfully", user });
+      res.status(HttpStatus.OK).json({ message: "Password reset successfully", user });
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(400).json({ error: errorMessage });
+      res.status(HttpStatus.BAD_REQUEST).json({ error: errorMessage });
     }
   }
 
@@ -322,20 +323,20 @@ class TutorController {
 
       console.log("tutorId", tutorId);
       if (!tutorId) {
-        res.status(400).json({ message: "tutor ID is required" });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "tutor ID is required" });
         return;
       }
 
       const tutor = await this.tutorService.getTutor(tutorId);
       console.log("tutor", tutor);
       if (!tutor) {
-        res.status(404).json({ message: "Tutor not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Tutor not found." });
         return;
       }
 
-      res.status(200).json(tutor);
+      res.status(HttpStatus.OK).json(tutor);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error." });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error." });
     }
   }
 
@@ -364,16 +365,16 @@ class TutorController {
         timeZone
       );
       if (!updatedTutor) {
-        res.status(404).json({ message: "Tutor not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Tutor not found" });
       } else {
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
           message: "Availability updated successfully",
           tutor: updatedTutor,
         });
       }
       console.log("Updated tutor availability:", updatedTutor);
     } catch (error) {
-      res.status(500).json({
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: "Failed to update availability",
         error: (error as Error).message,
       });
@@ -395,16 +396,16 @@ class TutorController {
       );
       if (!updateTutor) {
         res
-          .status(404)
+          .status(HttpStatus.NOT_FOUND)
           .json({ message: "Tutor not found or slot not deleted." });
       } else {
         res
-          .status(200)
+          .status(HttpStatus.OK)
           .json({ message: "Slot deleted successfully", tutor: updateTutor });
       }
     } catch (error) {
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({
           message: "Failed to delete slot",
           error: (error as Error).message,
@@ -418,13 +419,13 @@ class TutorController {
     try {
       const availability = await this.tutorService.getAvailability(tutorId);
       if (!availability) {
-        res.status(404).json({ message: "Tutor not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Tutor not found" });
         return;
       }
 
-      res.status(200).json(availability);
+      res.status(HttpStatus.OK).json(availability);
     } catch (error) {
-      res.status(500).json({ message: "something went wrong" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "something went wrong" });
     }
   }
 
@@ -435,7 +436,7 @@ class TutorController {
       const {tutorId}=req.params
 
       if (!tutorId) {
-         res.status(400).json({ message: "Tutor ID is required" });
+         res.status(HttpStatus.BAD_REQUEST).json({ message: "Tutor ID is required" });
          return
       }
 
@@ -444,7 +445,7 @@ class TutorController {
       
     } catch (error) {
       console.error("Error fetching earnings:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
     }
   }
 
@@ -458,11 +459,11 @@ class TutorController {
           path: "/",
         });
   
-        res.status(200).json({ message: "Logout successful" });
+        res.status(HttpStatus.OK).json({ message: "Logout successful" });
       } catch (error) {
         console.error("Error in logout:", error);
         res
-          .status(500)
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
           .json({ message: "An unexpected error occurred during logout" });
       }
     }

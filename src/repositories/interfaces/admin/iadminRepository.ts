@@ -13,6 +13,7 @@ interface IAdminRepository{
     updateTutorStatus(tutorId:string,isActive:boolean):Promise<ITutor | null>
     getAllBookings():Promise<IBooking[]>;
     getBookingById(bookingId:string):Promise<IBooking | null>;
+    getPendingTutorById(tutorId:string):Promise<ITutor | null>;
 
 }
 

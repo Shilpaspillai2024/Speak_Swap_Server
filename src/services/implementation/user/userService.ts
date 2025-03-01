@@ -281,8 +281,9 @@ class UserService implements IUserService {
     return user;
   }
 
-  async getAllUsers(): Promise<IUser[]> {
-    return await this.userRepository.getAllUsers();
+  
+  async getAllUsers(page: number=1, limit: number=6, loggedInUserId: string,searchQuery:string=""): Promise<IUser[]> {
+    return await this.userRepository.getAllUsers(page,limit,loggedInUserId,searchQuery)
   }
 
   async deleteuser(id: string): Promise<IUser | null> {
@@ -314,8 +315,8 @@ class UserService implements IUserService {
 
   // get All tutors for listing  user side
 
-  async listTutorsForUser(): Promise<ITutor[]> {
-    return await this.tutorRepository.getAllTutors();
+  async listTutorsForUser(searchQuery:string='',page:number=1,limit:number=9): Promise<{tutors:ITutor[],total:number}> {
+    return await this.tutorRepository.searchTutors(searchQuery,page,limit)
   }
 
   // get each tutor for profile listing

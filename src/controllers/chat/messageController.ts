@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import IChatService from "../../services/interfaces/chat/ichatService";
 import IMessageService from "../../services/interfaces/chat/imessageService";
+import { HttpStatus } from "../../constants/httpStatus";
 
 class MessageController{
     private messageService:IMessageService;
@@ -20,9 +21,9 @@ class MessageController{
     
         try {
           const newMessage = await this.messageService.createMessage(chatId, senderId, senderRole,message);
-          res.status(201).json(newMessage);
+          res.status(HttpStatus.CREATED).json(newMessage);
         } catch (error: any) {
-          res.status(500).json({ error: error.message });
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
         }
       }
     
@@ -31,9 +32,9 @@ class MessageController{
     
         try {
           const messages = await this.messageService.getMessagesByChatId(chatId);
-          res.status(200).json(messages);
+          res.status(HttpStatus.OK).json(messages);
         } catch (error: any) {
-          res.status(500).json({ error: error.message });
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
         }
       }
     
@@ -44,9 +45,9 @@ class MessageController{
           await this.messageService.markMessagesAsRead(chatId, participantId);
           const timestamp = new Date().toISOString();
         // await this.chatService.updateLastMessage(chatId,"",new Date(timestamp),0)
-          res.status(200).json({ success: true });
+          res.status(HttpStatus.OK).json({ success: true });
         } catch (error: any) {
-          res.status(500).json({ error: error.message });
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
         }
       }
 

@@ -60,9 +60,18 @@ class BookingService implements IBookingService {
     }
   }
 
-  async getUserBookings(userId: string): Promise<IBooking[]> {
+  async getUserBookings(
+    userId: string,
+    page: 1,
+    limit: 5
+  ): Promise<{
+    bookings: IBooking[];
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
     try {
-      return await this.bookingRepository.getBooking(userId);
+      return await this.bookingRepository.getBooking(userId,page,limit);
     } catch (error) {
       throw new Error("failed to fetch user bookings in user side");
     }
@@ -76,16 +85,23 @@ class BookingService implements IBookingService {
     }
   }
 
-
   async updatePaymentStatus(
     bookingId: string,
     status: string,
     failureReason?: string
   ): Promise<IBooking | null> {
     try {
-      return await this.bookingRepository.updateBookingPaymentStatus(bookingId, status, failureReason);
+      return await this.bookingRepository.updateBookingPaymentStatus(
+        bookingId,
+        status,
+        failureReason
+      );
     } catch (error) {
-      throw new Error(`Failed to update payment status: ${error instanceof Error ? error.message : "Unknown error"}`);
+      throw new Error(
+        `Failed to update payment status: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -96,49 +112,48 @@ class BookingService implements IBookingService {
     amount: number,
     creditedBy: string
   ): Promise<void> {
+    try {
+      if (paymentStatus === "paid") {
+        await this.bookingRepository.updateBookingPaymentStatus(
+          bookingId,
+          paymentStatus
+        );
 
-
-    try
-    {
-
-    if (paymentStatus === "paid") {
-      await this.bookingRepository.updateBookingPaymentStatus(
+        await this.walletService.creditTutorWallet(
+          tutorId,
+          amount,
+          "Booking Payment",
+          creditedBy
+        );
+      } else {
+        throw new Error("Payment verification failed");
+      }
+    } catch (error) {
+      await this.updatePaymentStatus(
         bookingId,
-        paymentStatus
+        "failed",
+        error instanceof Error ? error.message : "Payment verification failed"
       );
-
-      await this.walletService.creditTutorWallet(
-        tutorId,
-        amount,
-        "Booking Payment",
-        creditedBy
-      );
-    } else {
-      throw new Error("Payment verification failed");
+      throw error;
     }
-  }catch(error){
-    await this.updatePaymentStatus(
-      bookingId, 
-      "failed", 
-      error instanceof Error ? error.message : "Payment verification failed"
-    );
-    throw error;
-  }
   }
 
-
-
-  async getFailedBooking(userId: string, tutorId: string, selectedDate: Date, selectedSlot: { startTime: string; endTime: string; }): Promise<IBooking | null> {
+  async getFailedBooking(
+    userId: string,
+    tutorId: string,
+    selectedDate: Date,
+    selectedSlot: { startTime: string; endTime: string }
+  ): Promise<IBooking | null> {
     try {
       return await this.bookingRepository.getFailedBooking(
-          userId,
-          tutorId,
-          selectedDate,
-          selectedSlot
+        userId,
+        tutorId,
+        selectedDate,
+        selectedSlot
       );
-  } catch (error) {
+    } catch (error) {
       throw new Error("Failed to check existing booking");
-  }
+    }
   }
 
   async startSession(bookingId: string): Promise<IBooking | null> {
@@ -265,17 +280,19 @@ class BookingService implements IBookingService {
     return updatedBooking;
   }
 
+  async getTutorSessionStatics(tutorId: string): Promise<{
+    upcomingSessions: number;
+    completeSessions: number;
+    cancelSessions: number;
+  }> {
+    const upcomingSessions =
+      await this.bookingRepository.getUpcomingSessionsCount(tutorId);
+    const completeSessions =
+      await this.bookingRepository.getCompletedSessionsCount(tutorId);
+    const cancelSessions =
+      await this.bookingRepository.getCancelledSesionsCount(tutorId);
 
-
-
-
-
-  async getTutorSessionStatics(tutorId: string): Promise<{ upcomingSessions: number; completeSessions: number; cancelSessions: number; }> {
-    const upcomingSessions=await this.bookingRepository.getUpcomingSessionsCount(tutorId)
-    const completeSessions=await this.bookingRepository.getCompletedSessionsCount(tutorId)
-    const cancelSessions=await this.bookingRepository.getCancelledSesionsCount(tutorId)
-
-    return {upcomingSessions,completeSessions,cancelSessions}
+    return { upcomingSessions, completeSessions, cancelSessions };
   }
 }
 

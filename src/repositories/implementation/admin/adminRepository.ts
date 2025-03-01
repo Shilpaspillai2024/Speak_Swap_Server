@@ -42,6 +42,10 @@ class AdminRepository implements IAdminRepository {
     return pendingTutors;
   }
 
+  async getPendingTutorById(tutorId: string): Promise<ITutor | null> {
+    return await Tutor.findById(tutorId)
+  }
+
   async tutorVerify(
     tutorId: string,
     status: string,

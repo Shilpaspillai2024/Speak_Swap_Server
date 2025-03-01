@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import IChatService from "../../services/interfaces/chat/ichatService";
+import { HttpStatus } from "../../constants/httpStatus";
 
 
 class ChatController{
@@ -19,10 +20,10 @@ class ChatController{
 
         try {
             const chat=await this.chatService.createChat(participants)
-            res.status(201).json(chat)
+            res.status(HttpStatus.CREATED).json(chat)
             console.log(chat)
         } catch (error:any) {
-            res.status(500).json({ error: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
         }
     }
 
@@ -35,15 +36,15 @@ class ChatController{
             const chat=await this.chatService.getChatById(chatId)
 
             if(chat){
-                res.status(200).json(chat)
+                res.status(HttpStatus.OK).json(chat)
 
                
             }else{
-                res.status(404).json({ message: "Chat not found" });
+                res.status(HttpStatus.NOT_FOUND).json({ message: "Chat not found" });
             }
             
         } catch (error:any) {
-            res.status(500).json({ error: error.message }); 
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message }); 
         }
 
     }
@@ -54,10 +55,10 @@ class ChatController{
         try {
 
             const chats=await this.chatService.getChatsByParticipant(participantId)
-            res.status(200).json(chats)
+            res.status(HttpStatus.OK).json(chats)
             
         } catch (error:any) {
-            res.status(500).json({ error: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
             
         }
     }
@@ -68,9 +69,9 @@ class ChatController{
         try {
            
             await this.chatService.updateLastMessage(chatId,message,new Date(timestamp))
-            res.status(200).json({success:true})
+            res.status(HttpStatus.OK).json({success:true})
         } catch (error:any) {
-            res.status(500).json({ error: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
         }
     }
 

@@ -72,6 +72,17 @@ try {
         }
     }
 
+
+     async getTutorPendingTutorById(tutorId: string): Promise<ITutor | null> {
+        try {
+            return await this.adminRepository.getPendingTutorById(tutorId)
+            
+        } catch (error) {
+            console.error("Error in getPendingTutor:", error);
+            throw new Error("Failed to fetch pending tutors");
+        }
+    }
+
     async tutorVerify(tutorId: string, status: string, isActive: boolean): Promise<ITutor | null> {
         try {
             return await this.adminRepository.tutorVerify(tutorId, status, isActive);

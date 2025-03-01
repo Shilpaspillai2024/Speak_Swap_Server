@@ -26,7 +26,7 @@ export interface IUserService {
 
   resetPassword(email: string, newPassword: string): Promise<IUser>;
 
-  getAllUsers(): Promise<IUser[]>;
+  getAllUsers(page:number,limit:number,loggedInUserId:string,searchQuery:string): Promise<IUser[]>;
 
   deleteuser(id: string): Promise<IUser | null>;
 
@@ -36,7 +36,7 @@ export interface IUserService {
 
   updateUser(id: string, updateData: Partial<IUser>): Promise<IUser | null>;
 
-  listTutorsForUser(): Promise<ITutor[]>;
+  listTutorsForUser(searchQuery:string,page:number,limit:number): Promise<{tutors:ITutor[],total:number}>;
 
   tutorProfile(tutorId: string): Promise<ITutor | null>;
 
