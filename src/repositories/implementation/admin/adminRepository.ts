@@ -13,9 +13,16 @@ class AdminRepository implements IAdminRepository {
 
     return admin;
   }
-  async getAllUser(): Promise<IUser[]> {
-    const users = await User.find();
-    return users;
+  async getAllUser(page:number,limit:number): Promise<{
+    users:IUser[],
+    totalUsers:number
+  }> {
+
+    const skip=(page-1)*limit
+    const users = await User.find().skip(skip).limit(limit);
+
+    const totalUsers=await User.countDocuments();
+    return {users,totalUsers};
   }
 
   async updateUserStatus(
@@ -32,14 +39,22 @@ class AdminRepository implements IAdminRepository {
     return updateUser;
   }
 
-  async getTutors(): Promise<ITutor[]> {
-    const tutors = await Tutor.find();
-    return tutors;
+  async getTutors(page:number,limit:number): Promise<{tutors:ITutor[],totalTutors:number}> {
+
+    const skip=(page-1)*limit;
+    const tutors = await Tutor.find({status:"approved"}).skip(skip).limit(limit);
+    const totalTutors=await Tutor.countDocuments();
+    return {tutors,totalTutors};
   }
 
-  async getPendingTutors(): Promise<ITutor[]> {
-    const pendingTutors = await Tutor.find({ status: "pending" });
-    return pendingTutors;
+  async getPendingTutors(page:number,limit:number): Promise<{pendingTutors:ITutor[],total:number}> {
+    const skip=(page-1)*limit
+    const pendingTutors = await Tutor.find({ status: "pending" })
+    .skip(skip)
+    .limit(limit);
+
+    const total=await Tutor.countDocuments({status:"pending"})
+    return {pendingTutors,total};
   }
 
   async getPendingTutorById(tutorId: string): Promise<ITutor | null> {
@@ -74,10 +89,17 @@ class AdminRepository implements IAdminRepository {
     return updateTutor;
   }
 
-  async getAllBookings(): Promise<IBooking[]> {
+  async getAllBookings(page:number,limit:number): Promise<{bookings:IBooking[],totalBookings:number}> {
     try {
-      const bookings = await Booking.find().populate("tutorId").populate("userId");
-      return bookings;
+      let skip=(page-1)*limit
+      const bookings = await Booking.find()
+      .populate("tutorId")
+      .populate("userId")
+      .skip(skip)
+      .limit(limit);
+
+      const totalBookings=await Booking.countDocuments()
+      return {bookings,totalBookings};
     } catch (error) {
       throw new Error("Failed to fetch bookings");
     }

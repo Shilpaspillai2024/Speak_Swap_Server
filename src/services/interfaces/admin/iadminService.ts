@@ -6,13 +6,13 @@ import { IBooking } from "../../../models/booking/bookingModel";
 
 interface IAdminService{
     findByEmail(email:string):Promise<IAdmin | null>
-    getAllUser():Promise<IUser[]>
+    getAllUser(page:number,limit:number):Promise<{users:IUser[],totalUsers:number}>
     updateUserStatus(userId:string,isActive:boolean):Promise<IUser | null>
-    getTutors():Promise<ITutor[]>
-    getPendingTutors():Promise<ITutor[]>
+    getTutors(page:number,limit:number):Promise<{tutors:ITutor[],totalTutors:number}>
+    getPendingTutors(page:number,limit:number):Promise<{pendingTutors:ITutor[],total:number}>
     tutorVerify(tutorId:string,status:string,isActive:boolean):Promise<ITutor | null>
     updateTutorStatus(tutorId:string,isActive:boolean):Promise<ITutor | null>
-    getAllBookings():Promise<IBooking[]>
+    getAllBookings(page:number,limit:number):Promise<{bookings:IBooking[],totalBookings:number}>
     getBookingDetails(bookingId:string):Promise<IBooking | null>
     getTutorPendingTutorById(tutorId:string):Promise<ITutor | null>
 }

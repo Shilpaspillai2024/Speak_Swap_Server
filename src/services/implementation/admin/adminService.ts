@@ -28,10 +28,13 @@ try {
     }
 
 
-    async getAllUser():Promise<IUser[]>{
+    async getAllUser(page:number,limit:number):Promise<{
+       users:IUser[],
+       totalUsers:number
+    }>{
 
         try {
-            return await this.adminRepository.getAllUser();
+            return await this.adminRepository.getAllUser(page,limit);
             
         } catch (error) {
             throw new Error("Something went wrong while fetching users");
@@ -52,20 +55,20 @@ try {
 
 
 
-    async getTutors():Promise<ITutor[]>{
+    async getTutors(page:number,limit:number):Promise<{tutors:ITutor[],totalTutors:number}>{
         try {
-            return await this.adminRepository.getTutors();
+            return await this.adminRepository.getTutors(page,limit);
             
         } catch (error) {
-            return await this.adminRepository.getTutors();
+            throw new Error("Failed to fetch  tutors");
         }
        
 
     }
 
-    async getPendingTutors(): Promise<ITutor[]> {
+    async getPendingTutors(page:number,limit:number): Promise<{pendingTutors:ITutor[],total:number}> {
         try {
-            return await this.adminRepository.getPendingTutors();
+            return await this.adminRepository.getPendingTutors(page,limit);
         } catch (error) {
             console.error("Error in getPendingTutors:", error);
             throw new Error("Failed to fetch pending tutors");
@@ -101,10 +104,11 @@ try {
         }
     }
     
-    async getAllBookings():Promise<IBooking[]>{
+    async getAllBookings(page:number,limit:number):Promise<{bookings:IBooking[],totalBookings:number}>{
         try {
-            const bookings = await this.adminRepository.getAllBookings();
-             return bookings;
+
+            return await this.adminRepository.getAllBookings(page,limit);
+             
         } catch (error) {
             throw new Error("Failed to fetch all bookings");
         }

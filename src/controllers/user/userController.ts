@@ -503,7 +503,7 @@ class UserController {
       const result=await this.userService.listTutorsForUser(searchQuery,page,limit);
 
       console.log("fetched tutors:",result)
-      //res.status(HttpStatus.OK).json(tutors)
+     
       
 
 

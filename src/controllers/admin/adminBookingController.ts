@@ -19,10 +19,21 @@ class AdminBookingController{
                 return;
               }
 
-              const bookings=await this.adminService.getAllBookings()
+              const page=parseInt(req.query.page as string) || 1
+              const limit=parseInt(req.query.limit as string) || 10
+
+              const{bookings,totalBookings}=await this.adminService.getAllBookings(page,limit)
+
+              const totalPages=Math.ceil(totalBookings/limit);
               res.status(HttpStatus.OK).json({
                 message: "Bookings fetched successfully.",
                 bookings,
+                meta:{
+                  totalItems:totalBookings,
+                  totalPages,
+                  currentPage:page,
+                  itemsPerPage:limit
+                }
               });
 
             

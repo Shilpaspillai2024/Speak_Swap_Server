@@ -16,7 +16,9 @@ class AdminController {
       const { email, password } = req.body;
 
       if (!email || !password) {
-        res.status(HttpStatus.BAD_REQUEST).json({ message: "Missing credentials" });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "Missing credentials" });
         return;
       }
 
@@ -24,13 +26,17 @@ class AdminController {
 
       console.log("isadmin ", isAdmin);
       if (!isAdmin) {
-        res.status(HttpStatus.BAD_REQUEST).json({ message: "Incorrect email or password" });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "Incorrect email or password" });
         return;
       }
 
       const isPassword = password === isAdmin.password;
       if (!isPassword) {
-        res.status(HttpStatus.BAD_REQUEST).json({ message: "incorrect password" });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "incorrect password" });
         return;
       }
 
@@ -67,7 +73,9 @@ class AdminController {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: errorMessage });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: errorMessage });
     }
   }
 
@@ -79,14 +87,18 @@ class AdminController {
       console.log("refreshtoken:", refreshToken);
 
       if (!refreshToken) {
-        res.status(HttpStatus.UNAUTHORIZED).json({ message: "Refresh token missing" });
+        res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: "Refresh token missing" });
         return;
       }
 
       const decoded = JwtUtils.verifyToken(refreshToken, true);
 
       if (!decoded) {
-        res.status(HttpStatus.UNAUTHORIZED).json({ message: "Invalid Refresh token" });
+        res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: "Invalid Refresh token" });
         return;
       }
       const payload = {
@@ -129,15 +141,35 @@ class AdminController {
       console.log(req.admin);
 
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied Admins only" });
         return;
       }
-      const users = await this.adminService.getAllUser();
+
+      const page = parseInt(req.query.page as string) || 1;
+
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { users, totalUsers } = await this.adminService.getAllUser(
+        page,
+        limit
+      );
       console.log("Fetched users:", users);
-      res.status(HttpStatus.OK).json({ message: "Users fetched successfully", users });
+      res.status(HttpStatus.OK).json({
+        message: "Users fetched successfully",
+        users,
+        meta: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalUsers,
+          totalPages: Math.ceil(totalUsers / limit)
+        }
+      });
     } catch (error) {
       console.error("Error fetching users:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "fetch user details error" });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "fetch user details error" });
     }
   }
 
@@ -146,7 +178,9 @@ class AdminController {
   async blockUnblockUser(req: CustomRequest, res: Response): Promise<void> {
     try {
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied Admins only" });
         return;
       }
 
@@ -176,67 +210,109 @@ class AdminController {
       });
     } catch (error) {
       console.error("Error updating user status:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occurred." });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "An unexpected error occurred." });
     }
   }
 
   async getTutors(req: CustomRequest, res: Response): Promise<void> {
     try {
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied admins only" });
         return;
       }
 
-      const tutor = await this.adminService.getTutors();
-      console.log("fetched tutors:", tutor);
-      if (!tutor) {
+      const page=parseInt(req.query.page as string) || 1;
+      const limit=parseInt(req.query.limit as string) || 10;
+
+      const {tutors,totalTutors} = await this.adminService.getTutors(page,limit);
+
+      const totalPages=Math.ceil(totalTutors / limit)
+      console.log("fetched tutors:", tutors);
+      if (!tutors) {
         res.status(HttpStatus.NOT_FOUND).json({ message: "No tutors found" });
         return;
       }
-      res.status(HttpStatus.OK).json({ message: " tutors fetched Successfully", tutor });
+      res
+        .status(HttpStatus.OK)
+        .json({ message: " tutors fetched Successfully",
+           tutors ,
+           meta:{
+            totalItems:totalTutors,
+            totalPages,
+            currentPage:page,
+            itemsPerPage:limit
+
+           }
+          });
     } catch (error) {
       console.error("Error in fetching tutors:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "failed to fetch tutor details" });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "failed to fetch tutor details" });
     }
   }
 
   async getPendingTutors(req: CustomRequest, res: Response): Promise<void> {
     try {
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied Admins only" });
         return;
       }
-      const pendingTutors = await this.adminService.getPendingTutors();
-      res
-        .status(HttpStatus.OK)
-        .json({
-          message: "pending tutors fetched successfully",
-          tutors: pendingTutors,
-        });
+
+      const page=parseInt(req.query.page as string) ||1;
+      const limit=parseInt(req.query.limit as string) || 10;
+
+
+
+      const {pendingTutors,total} = await this.adminService.getPendingTutors(page,limit);
+
+      const totalPages=Math.ceil(total/limit)
+
+      res.status(HttpStatus.OK).json({
+        message: "pending tutors fetched successfully",
+        tutors: pendingTutors,
+        meta:{
+          totalItems:total,
+          totalPages,
+          currentPage:page,
+          itemsPerPage:limit
+        }
+      });
     } catch (error) {
       console.error("Error fetching pending tutors:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch pending tutors" });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Failed to fetch pending tutors" });
     }
   }
-
 
   async pendingTutorsDetails(req: CustomRequest, res: Response): Promise<void> {
     try {
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied Admins only" });
         return;
       }
-      const {tutorId}=req.params
-      const pendingTutor=await this.adminService.getTutorPendingTutorById(tutorId)
-      res
-        .status(HttpStatus.OK)
-        .json({
-          message: "pending tutor fetched successfully",
-          tutors: pendingTutor,
-        });
+      const { tutorId } = req.params;
+      const pendingTutor = await this.adminService.getTutorPendingTutorById(
+        tutorId
+      );
+      res.status(HttpStatus.OK).json({
+        message: "pending tutor fetched successfully",
+        tutors: pendingTutor,
+      });
     } catch (error) {
       console.error("Error fetching pending tutors:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch pending tutors" });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Failed to fetch pending tutors" });
     }
   }
 
@@ -269,7 +345,9 @@ class AdminController {
         .json({ message: `Tutor ${status} successfully.`, tutor: verifyTutor });
     } catch (error) {
       console.error("Error updating tutor verification:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occurred." });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "An unexpected error occurred." });
     }
   }
 
@@ -278,7 +356,9 @@ class AdminController {
   async blockUnblockTutor(req: CustomRequest, res: Response): Promise<void> {
     try {
       if (!req.admin) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: "Access denied Admins only" });
         return;
       }
 
@@ -308,7 +388,9 @@ class AdminController {
       });
     } catch (error) {
       console.error("Error updating tutor status:", error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occurred." });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "An unexpected error occurred." });
     }
   }
 }
