@@ -75,6 +75,8 @@ router.get("/tutors/:tutorId",authMiddleware,(req,res)=>userController.tutorProf
 
 router.get(`/wallet`,authMiddleware,(req,res)=>walletController.getUserWalletDetails(req,res))
 
+router.get(`/userwallet`,authMiddleware,(req,res)=>walletController.getUserWallet(req,res))
+
 router.post(`/logout`,authMiddleware,(req,res)=>userController.logoutUser(req,res))
 
 export default router;

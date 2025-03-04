@@ -20,7 +20,7 @@ interface IBookingService {
     totalPages: number;
   }>;
 
-  getTutorBookings(tutorId: string): Promise<IBooking[]>;
+  getTutorBookings(tutorId: string,page:number,limit:number): Promise<{bookings:IBooking[],total:number}>;
 
   updatePaymentStatus(bookingId:string,status:string,failureReason?:string):Promise<IBooking | null>
 
@@ -50,6 +50,8 @@ interface IBookingService {
       completeSessions:number;
       cancelSessions:number;
      }>
+
+     cancelBookingUser(bookingId:string,userId:string ,cancellationReason:string):Promise<IBooking | null>
      
 }
 

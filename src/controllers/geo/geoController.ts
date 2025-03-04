@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import IGeoService from "../../services/interfaces/geo/igeoService";
 import {HttpStatus} from '../../constants/httpStatus'
+import { MESSAGES } from "../../constants/message";
 
 class GeoController{
     private geoService:IGeoService;
@@ -20,7 +21,7 @@ class GeoController{
             
         } catch (error) {
 
-            let errorMessage = 'An unexpected error occurred';
+            let errorMessage = MESSAGES.UNEXPECTED_ERROR;
             if (error instanceof Error) {
               errorMessage = error.message;
             }
@@ -40,7 +41,7 @@ class GeoController{
                 
             } catch (error) {
     
-                let errorMessage = 'An unexpected error occurred';
+                let errorMessage = MESSAGES.UNEXPECTED_ERROR;
                 if (error instanceof Error) {
                   errorMessage = error.message;
                 }

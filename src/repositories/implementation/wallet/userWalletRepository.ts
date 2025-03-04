@@ -13,8 +13,39 @@ class UserWalletRepository implements IUserWalletRepository{
         return await wallet.save();
     }
 
-    async getWalletByUserId(userId: string): Promise<IUserWallet | null> {
-        return await UserWallet.findOne({userId})
+    async getWalletByUserId(userId: string,page:number,limit:number): Promise<{wallet:IUserWallet | null,totalTransactions:number}> {
+
+      try {
+       
+
+        const skip=(page-1)*limit;
+        const wallet=await UserWallet.findOne({userId}).lean();
+        if(!wallet){
+          return {wallet:null,totalTransactions:0}
+        }
+
+
+        const totalTransactions = wallet.transactions.length;
+        const paginatedTransactions = wallet.transactions.slice(skip, skip + limit);
+
+
+        return{
+          wallet:{
+            ...wallet,
+           transactions: paginatedTransactions,
+          }as IUserWallet,
+          totalTransactions,
+        }
+     
+        
+      } catch (error) {
+        console.log("wallet fetching error")
+        return { wallet: null, totalTransactions: 0 };
+      }
+    }
+
+    async getWallet(userId: string): Promise<IUserWallet | null> {
+      return await UserWallet.findOne({userId})
     }
 
     async creditAmount(userId: string, amount: number, description: string): Promise<IUserWallet | null> {

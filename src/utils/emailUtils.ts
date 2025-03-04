@@ -9,6 +9,7 @@ interface BookingDetails{
   sessionDate:string;
   sessionTime:string;
   refundAmount?:number;
+  userName?:string; 
 }
 
 class EmailUtils {
@@ -155,6 +156,77 @@ class EmailUtils {
       return { success: false, message: "Failed to send cancellation notification" };
   }
 
+  }
+
+
+
+  static async sendTutorCancellationNotification(
+    tutorEmail: string,
+    tutorName: string,
+    bookingDetails: BookingDetails
+  ): Promise<{ success: boolean, message: string }> {
+    const { userName, sessionDate, sessionTime} = bookingDetails;
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>SpeakSwap Session Cancellation</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 5px; border: 1px solid #e0e0e0;">
+        <tr>
+          <td style="padding: 20px; background-color: #2c3e50; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0;">SpeakSwap</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px;">
+            <h2 style="color: #e74c3c; margin-bottom: 20px;">Session Cancellation Notice</h2>
+            <p style="margin-bottom: 15px;">Hello ${tutorName},</p>
+            <p style="margin-bottom: 15px;">We want to inform you that a student has cancelled their upcoming session with you.</p>
+            
+            <div style="background-color: #f9f9f9; border-left: 4px solid #e74c3c; padding: 15px; margin-bottom: 20px;">
+              <h3 style="margin-top: 0; margin-bottom: 10px; color: #333;">Session Details:</h3>
+              <p style="margin: 5px 0;"><strong>Student:</strong> ${userName || 'A student'}</p>
+              <p style="margin: 5px 0;"><strong>Date:</strong> ${sessionDate}</p>
+              <p style="margin: 5px 0;"><strong>Time:</strong> ${sessionTime}</p>
+             
+            </div>
+            
+            <p style="margin-bottom: 15px;">This time slot is now available for other bookings. We'll notify you when new students book sessions with you.</p>
+            
+            <p style="margin-bottom: 20px;">If you have any questions or concerns, please contact our support team.</p>
+            <p style="margin-bottom: 15px;">Best regards,<br>The SpeakSwap Team</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color: #f5f5f5; color: #666; text-align: center; padding: 15px; font-size: 12px;">
+            © 2024 SpeakSwap. All rights reserved.<br>
+            If you have any questions, please contact <a href="mailto:support@speakswap.com" style="color: #3498db;">support@speakswap.com</a>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+    const mailOptions = {
+      from: `"SpeakSwap" <${process.env.GMAIL_USER}>`,
+      to: tutorEmail,
+      subject: `${userName} Has Cancelled Their SpeakSwap Session`,
+      html: htmlContent,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      return { success: true, message: "Tutor cancellation notification sent successfully" };
+    } catch (error) {
+      console.error("Email sending error:", error);
+      return { success: false, message: "Failed to send tutor cancellation notification" };
+    }
   }
 }
 

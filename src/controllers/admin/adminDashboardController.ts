@@ -2,6 +2,7 @@ import { Response } from "express";
 import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
 import { IDashboardService } from "../../services/interfaces/admin/iadminDashboardService";
 import { HttpStatus } from "../../constants/httpStatus";
+import { MESSAGES } from "../../constants/message";
 
 
 export default class DashboardController {
@@ -22,7 +23,7 @@ export default class DashboardController {
       } catch (error:unknown) {
         console.error('Error fetching dashboard data:', error);
 
-        let errorMessage = 'Failed to fetch dashboard data';
+        let errorMessage = MESSAGES.FETCH_DASHBOARD_ERROR;
       
         if (error instanceof Error) {
           errorMessage = error.message;

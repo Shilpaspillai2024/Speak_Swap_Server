@@ -19,7 +19,8 @@ interface IWalletService {
   /// user related wallet service interface
 
   createUserWallet(userId: string): Promise<IUserWallet>;
-  getUserWalletDetails(userId: string): Promise<IUserWallet | null>;
+  getUserWallet(userId:string):Promise<IUserWallet | null>;
+  getUserWalletDetails(userId: string,page:number,limit:number): Promise<{wallet:IUserWallet | null,totalTransactions:number}>;
   creditUserWallet(userId: string, amount: number, description: string): Promise<IUserWallet>;
   debitUserWallet(userId: string, amount: number): Promise<IUserWallet | null>;
 

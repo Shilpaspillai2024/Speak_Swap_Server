@@ -2,6 +2,7 @@ import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
 import IAdminService from "../../services/implementation/admin/adminService";
 import { Response } from "express";
 import { HttpStatus } from "../../constants/httpStatus";
+import { MESSAGES } from "../../constants/message";
 
 class AdminBookingController{
 
@@ -15,7 +16,7 @@ class AdminBookingController{
     async getAllBookings(req:CustomRequest,res:Response):Promise<void>{
         try {
             if (!req.admin) {
-                res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+                res.status(HttpStatus.FORBIDDEN).json({ message:MESSAGES.ACCESS_DENIED });
                 return;
               }
 
@@ -39,7 +40,7 @@ class AdminBookingController{
             
         } catch (error) {
             console.error("Error fetching bookings:", error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch bookings." });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.FETCH_BOOKINGS_ERROR });
         }
     }
 
@@ -51,14 +52,14 @@ class AdminBookingController{
             const {bookingId}=req.params;
 
             if (!req.admin) {
-                res.status(HttpStatus.FORBIDDEN).json({ message: "Access denied Admins only" });
+                res.status(HttpStatus.FORBIDDEN).json({ message:MESSAGES.ACCESS_DENIED});
                 return;
               }
 
               const booking=await this.adminService.getBookingDetails(bookingId)
 
               if (!booking) {
-                res.status(HttpStatus.NOT_FOUND).json({ message: "Booking not found" });
+                res.status(HttpStatus.NOT_FOUND).json({ message: MESSAGES.BOOKING_NOT_FOUND});
                 return;
               }
 
@@ -69,7 +70,7 @@ class AdminBookingController{
             
         } catch (error) {
             console.error("Error fetching bookings:", error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch bookings." });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message:MESSAGES.FETCH_BOOKINGS_ERROR });
         }
      }
 

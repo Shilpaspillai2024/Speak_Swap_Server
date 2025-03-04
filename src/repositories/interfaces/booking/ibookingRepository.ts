@@ -14,7 +14,7 @@ export interface IBookingRepository{
     getBooking(userId:string,page:number,limit:number):Promise<{bookings:IBooking[],totalItems: number;
         currentPage: number;
         totalPages: number;}>
-    getTutorBookings(tutorId:string):Promise<IBooking[]>
+    getTutorBookings(tutorId:string,page:number,limit:number):Promise<{bookings:IBooking[],total:number}>
     startSession(bookingId:string,sessionStartTime:Date):Promise<IBooking | null>;
     completeSession(bookingId:string,sessionEndTime:Date):Promise<IBooking | null>;
     cancelBooking(bookingId:string):Promise<IBooking | null>
@@ -28,7 +28,13 @@ export interface IBookingRepository{
    
     getFailedBooking(userId:string,tutorId:string,selectedDate: Date,
         selectedSlot: { startTime: string; endTime: string }):Promise<IBooking | null>
+
+
+        cancelBookingUser(bookingId:string,cancellationReason: string):Promise<IBooking | null>
     
+        getBookings(bookingId:string):Promise<IBooking | null>
+
+
 }
 
 

@@ -1,0 +1,41 @@
+export const MESSAGES = {
+  MISSING_CREDENTIALS: "Missing credentials",
+  INCORRECT_EMAIL_OR_PASSWORD: "Incorrect email or password",
+  INCORRECT_PASSWORD: "Incorrect password",
+  LOGIN_SUCCESS: "Login Successful",
+  UNEXPECTED_ERROR: "An unexpected error occurred",
+  REFRESH_TOKEN_MISSING: "Refresh token missing",
+  INVALID_REFRESH_TOKEN: "Invalid Refresh token",
+  LOGOUT_SUCCESS: "Logout successful",
+  ACCESS_DENIED: "Access denied Admins only",
+  FETCH_USERS_SUCCESS: "Users fetched successfully",
+  FETCH_USERS_ERROR: "Fetch user details error",
+  INVALID_IS_ACTIVE: "Invalid 'isActive' value. Must be a boolean.",
+  USER_NOT_FOUND: "User not found.",
+  FETCH_TUTORS_SUCCESS: "Tutors fetched successfully",
+  FETCH_TUTORS_ERROR: "Failed to fetch tutor details",
+  NO_TUTORS_FOUND: "No tutors found",
+  FETCH_PENDING_TUTORS_SUCCESS: "Pending tutors fetched successfully",
+  FETCH_PENDING_TUTORS_ERROR: "Failed to fetch pending tutors",
+  FETCH_PENDING_TUTOR_SUCCESS: "Pending tutor fetched successfully",
+  FETCH_PENDING_TUTOR_ERROR: "Failed to fetch pending tutor details",
+  INVALID_TUTOR_STATUS: "Invalid status, only 'approved' or 'rejected' allowed",
+  TUTOR_NOT_FOUND: "Tutor not found.",
+  FETCH_BOOKINGS_ERROR:"FAiled to fetch bookings",
+  BOOKING_NOT_FOUND:"Bookings not found",
+  FETCH_DASHBOARD_ERROR:"Failed to fetch dashboard data",
+
+
+ 
+  TOKEN_REQUIRED: "Token is required",
+  TOKEN_AND_OTP_REQUIRED: "Token and OTP are required",
+  PASSWORD_MISMATCH: "Passwords do not match",
+  INVALID_TOKEN: "Invalid or expired token",
+  ALL_FIELDS_REQUIRED: "All fields are required",
+  EMAIL_REQUIRED: "Email is required",
+  AUTHENTICATION_FAILED: "Authentication failed",
+  PROFILE_PICTURE_REQUIRED: "Token and file are required",
+  INTERNAL_SERVER_ERROR:"Internal Server error",
+
+  UNKNOWN_ERROR:"Unknown Error"
+};

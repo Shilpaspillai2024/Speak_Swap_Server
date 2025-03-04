@@ -141,8 +141,17 @@ class BookingRepository implements IBookingRepository {
     }
   }
 
-  async getTutorBookings(tutorId: string): Promise<IBooking[]> {
+  async getTutorBookings(tutorId: string,page:number,limit:number): Promise<{bookings:IBooking[],total:number}> {
     try {
+
+
+      const skip=(page-1)*limit;
+
+      const total = await Booking.countDocuments({
+        tutorId: new mongoose.Types.ObjectId(tutorId),
+        status: "confirmed",
+        paymentStatus: "paid",
+      });
       const bookings = await Booking.find({
         tutorId: new mongoose.Types.ObjectId(tutorId),
         status: "confirmed",
@@ -153,9 +162,11 @@ class BookingRepository implements IBookingRepository {
           "_id fullName email phone profilePhoto knownLanguages learnLanguage learnProficiency"
         )
         .populate("tutorId", "_id name email profilePhoto teachLanguage")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .skip(skip) 
+        .limit(limit);
 
-      return bookings;
+        return { bookings, total };
     } catch (error) {
       throw new Error("Failed to fetch bookings");
     }
@@ -235,6 +246,42 @@ class BookingRepository implements IBookingRepository {
       tutorId,
       status: "cancelled",
     });
+  }
+
+
+
+  async cancelBookingUser(bookingId: string, cancellationReason: string): Promise<IBooking | null> {
+     try {
+
+      const booking=await Booking.findByIdAndUpdate(bookingId,{
+        status: 'cancelled',
+          paymentStatus: 'refunded',
+          cancellationReason,
+          cancelledAt: new Date()
+      },
+      {new:true}
+    );
+    return booking;
+      
+     } catch (error) {
+      console.error('Error in cancelBooking repository:', error);
+      throw error;
+     }
+  }
+
+
+ async getBookings(bookingId: string): Promise<IBooking | null> {
+    try {
+
+      const booking=await Booking.findById(bookingId)
+      .populate('userId')
+      .populate('tutorId')
+      return booking
+      
+    } catch (error) {
+      console.error('Error in getBookingById repository:', error);
+      throw error;
+    }
   }
 }
 

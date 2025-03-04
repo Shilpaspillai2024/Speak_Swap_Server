@@ -5,6 +5,7 @@ import IWalletService from "../../interfaces/wallet/iwalletService";
 import { IBookingDTO } from "../../interfaces/booking/ibookingDTO";
 import EmailUtils from "../../../utils/emailUtils";
 import moment from "moment";
+import mongoose from "mongoose";
 
 class BookingService implements IBookingService {
   private bookingRepository: IBookingRepository;
@@ -77,9 +78,9 @@ class BookingService implements IBookingService {
     }
   }
 
-  async getTutorBookings(tutorId: string): Promise<IBooking[]> {
+  async getTutorBookings(tutorId: string,page:number,limit:number): Promise<{bookings:IBooking[],total:number}> {
     try {
-      return await this.bookingRepository.getTutorBookings(tutorId);
+      return await this.bookingRepository.getTutorBookings(tutorId,page,limit);
     } catch (error) {
       throw new Error("failed to fetch bookings in tutor side");
     }
@@ -217,7 +218,7 @@ class BookingService implements IBookingService {
         await this.walletService.deductFunds(tutorId, refundAmount);
         console.log("Deduction function executed");
 
-        let userWallet = await this.walletService.getUserWalletDetails(
+        let userWallet = await this.walletService.getUserWallet(
           updatedBooking.userId.toString()
         );
 
@@ -294,6 +295,130 @@ class BookingService implements IBookingService {
 
     return { upcomingSessions, completeSessions, cancelSessions };
   }
+
+
+
+  async cancelBookingUser(bookingId: string, userId: string, cancellationReason: string): Promise<IBooking | null> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
+    try {
+      const booking = await this.bookingRepository.getBookings(bookingId);
+      if (!booking) {
+        throw new Error('Booking not found');
+      }
+  
+      if (booking.userId._id.toString() !== userId) {
+        throw new Error('Unauthorized: Booking does not belong to this user');
+      }
+  
+      if (booking.status === 'cancelled') {
+        throw new Error('Booking is already cancelled');
+      }
+      
+      if (booking.status === 'completed' || booking.status === 'in-progress') {
+        throw new Error('Cannot cancel a completed or in-progress session');
+      }
+  
+      const sessionDate = new Date(booking.selectedDate);
+      const parseTime = (timeStr: string) => {
+        const [time, modifier] = timeStr.split(" ");
+        let [hours, minutes] = time.split(":").map(Number);
+  
+        if (modifier === "PM" && hours !== 12) hours += 12;
+        if (modifier === "AM" && hours === 12) hours = 0;
+  
+        return { hours, minutes };
+      };
+  
+      const { hours, minutes } = parseTime(booking.selectedSlot.startTime);
+      sessionDate.setHours(hours, minutes, 0, 0);
+      
+      const now = new Date();
+      const timeDifference = sessionDate.getTime() - now.getTime();
+      const hoursDifference = timeDifference / (1000 * 60 * 60);
+      
+      if (hoursDifference < 24) {
+        throw new Error('Bookings can only be cancelled at least 24 hours before the session');
+      }
+  
+      const cancelledBooking = await this.bookingRepository.cancelBookingUser(
+        bookingId,
+        cancellationReason
+      );
+  
+      if (!cancelledBooking) {
+        throw new Error('Failed to cancel booking');
+      }
+  
+      let userWallet = await this.walletService.getUserWallet(userId);
+      
+      if (!userWallet) {
+        userWallet = await this.walletService.createUserWallet(userId);
+      }
+  
+      await this.walletService.creditUserWallet(
+        userId,
+        booking.sessionFee,
+        `Refund for cancelled booking`
+      );
+  
+      if (booking.paymentStatus === 'paid') {
+        await this.walletService.deductFunds(
+          booking.tutorId._id.toString(),
+          booking.sessionFee
+        );
+      }
+  
+      try {
+        const populatedBooking = await this.bookingRepository.getPopulatedBooking(bookingId);
+  
+        if (populatedBooking && populatedBooking.userId) {
+          const formattedDate = moment(populatedBooking.selectedDate).format(
+            "MMMM D, YYYY"
+          );
+          
+          interface PopulatedUser {
+            email: string;
+            fullName: string;
+          }
+          
+          interface PopulatedTutor {
+            email: string;
+            name: string;
+          }
+  
+          const userId = populatedBooking.userId as unknown as PopulatedUser;
+          const tutorId = populatedBooking.tutorId as unknown as PopulatedTutor;
+          
+          await EmailUtils.sendTutorCancellationNotification(
+            tutorId.email,
+            tutorId.name,
+            {
+              userName:userId.fullName,
+              tutorName:tutorId.name,
+              sessionDate: formattedDate,
+              sessionTime: `${populatedBooking.selectedSlot.startTime} - ${populatedBooking.selectedSlot.endTime}`,
+              refundAmount: booking.sessionFee,
+            }
+          );
+        }
+      } catch (emailError) {
+        console.error('Failed to send cancellation email:', emailError);
+      }
+  
+      await session.commitTransaction();
+      session.endSession();
+      
+      return cancelledBooking;
+        
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
+
 }
 
 export default BookingService;

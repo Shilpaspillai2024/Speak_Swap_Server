@@ -3,6 +3,7 @@ import JwtUtils from "../../utils/jwtUtils";
 import { CustomRequest } from "../../middlewares/adminAuthMiddleware";
 import IAdminService from "../../services/interfaces/admin/iadminService";
 import { HttpStatus } from "../../constants/httpStatus";
+import { MESSAGES } from "../../constants/message";
 
 class AdminController {
   private adminService: IAdminService;
@@ -18,7 +19,7 @@ class AdminController {
       if (!email || !password) {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "Missing credentials" });
+          .json({ message:MESSAGES.MISSING_CREDENTIALS });
         return;
       }
 
@@ -28,7 +29,7 @@ class AdminController {
       if (!isAdmin) {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "Incorrect email or password" });
+          .json({ message:MESSAGES.INCORRECT_EMAIL_OR_PASSWORD});
         return;
       }
 
@@ -36,7 +37,7 @@ class AdminController {
       if (!isPassword) {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "incorrect password" });
+          .json({ message:MESSAGES.INCORRECT_PASSWORD });
         return;
       }
 
@@ -64,12 +65,12 @@ class AdminController {
       });
 
       res.status(HttpStatus.OK).json({
-        message: "Login SuccessFull",
+        message:MESSAGES.LOGIN_SUCCESS,
         accessToken,
         isAdmin,
       });
     } catch (error) {
-      let errorMessage = "An unexpected error Occured";
+      let errorMessage =MESSAGES.UNEXPECTED_ERROR;
       if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -89,7 +90,7 @@ class AdminController {
       if (!refreshToken) {
         res
           .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: "Refresh token missing" });
+          .json({ message:MESSAGES.REFRESH_TOKEN_MISSING });
         return;
       }
 
@@ -98,7 +99,7 @@ class AdminController {
       if (!decoded) {
         res
           .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: "Invalid Refresh token" });
+          .json({ message: MESSAGES.INVALID_REFRESH_TOKEN });
         return;
       }
       const payload = {
@@ -113,7 +114,7 @@ class AdminController {
       res.status(HttpStatus.OK).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error in token refresh:", error);
-      res.status(500).json({ message: "An unexpected error occured" });
+      res.status(500).json({ message:MESSAGES.UNEXPECTED_ERROR });
     }
   }
 
@@ -126,12 +127,12 @@ class AdminController {
         path: "/",
       });
 
-      res.status(HttpStatus.OK).json({ message: "Logout successful" });
+      res.status(HttpStatus.OK).json({ message:MESSAGES.LOGOUT_SUCCESS });
     } catch (error) {
       console.error("Error in logout:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "An unexpected error occurred during logout" });
+        .json({ message:MESSAGES.UNEXPECTED_ERROR });
     }
   }
 
@@ -143,7 +144,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied Admins only" });
+          .json({ message:MESSAGES.ACCESS_DENIED });
         return;
       }
 
@@ -156,7 +157,7 @@ class AdminController {
       );
       console.log("Fetched users:", users);
       res.status(HttpStatus.OK).json({
-        message: "Users fetched successfully",
+        message:MESSAGES.FETCH_USERS_SUCCESS,
         users,
         meta: {
           currentPage: page,
@@ -169,7 +170,7 @@ class AdminController {
       console.error("Error fetching users:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "fetch user details error" });
+        .json({ message:MESSAGES.FETCH_USERS_ERROR });
     }
   }
 
@@ -180,7 +181,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied Admins only" });
+          .json({ message:MESSAGES.ACCESS_DENIED });
         return;
       }
 
@@ -190,7 +191,7 @@ class AdminController {
       if (typeof isActive !== "boolean") {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "Invalid 'isActive' value. Must be a boolean." });
+          .json({ message:MESSAGES.INVALID_IS_ACTIVE });
         return;
       }
 
@@ -200,7 +201,7 @@ class AdminController {
       );
 
       if (!updateStatus) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: "User not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message:MESSAGES.USER_NOT_FOUND });
         return;
       }
 
@@ -212,7 +213,7 @@ class AdminController {
       console.error("Error updating user status:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "An unexpected error occurred." });
+        .json({ message: MESSAGES.UNEXPECTED_ERROR });
     }
   }
 
@@ -221,7 +222,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied admins only" });
+          .json({ message:MESSAGES.ACCESS_DENIED });
         return;
       }
 
@@ -233,12 +234,12 @@ class AdminController {
       const totalPages=Math.ceil(totalTutors / limit)
       console.log("fetched tutors:", tutors);
       if (!tutors) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: "No tutors found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: MESSAGES.TUTOR_NOT_FOUND });
         return;
       }
       res
         .status(HttpStatus.OK)
-        .json({ message: " tutors fetched Successfully",
+        .json({ message: MESSAGES.FETCH_TUTORS_SUCCESS,
            tutors ,
            meta:{
             totalItems:totalTutors,
@@ -252,7 +253,7 @@ class AdminController {
       console.error("Error in fetching tutors:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "failed to fetch tutor details" });
+        .json({ message: MESSAGES.FETCH_TUTORS_ERROR});
     }
   }
 
@@ -261,7 +262,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied Admins only" });
+          .json({ message:MESSAGES.ACCESS_DENIED });
         return;
       }
 
@@ -275,7 +276,7 @@ class AdminController {
       const totalPages=Math.ceil(total/limit)
 
       res.status(HttpStatus.OK).json({
-        message: "pending tutors fetched successfully",
+        message: MESSAGES.FETCH_PENDING_TUTORS_SUCCESS,
         tutors: pendingTutors,
         meta:{
           totalItems:total,
@@ -288,7 +289,7 @@ class AdminController {
       console.error("Error fetching pending tutors:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "Failed to fetch pending tutors" });
+        .json({ message:MESSAGES.FETCH_PENDING_TUTORS_ERROR });
     }
   }
 
@@ -297,7 +298,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied Admins only" });
+          .json({ message: MESSAGES.ACCESS_DENIED });
         return;
       }
       const { tutorId } = req.params;
@@ -305,14 +306,14 @@ class AdminController {
         tutorId
       );
       res.status(HttpStatus.OK).json({
-        message: "pending tutor fetched successfully",
+        message:MESSAGES.FETCH_PENDING_TUTORS_SUCCESS,
         tutors: pendingTutor,
       });
     } catch (error) {
       console.error("Error fetching pending tutors:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "Failed to fetch pending tutors" });
+        .json({ message: MESSAGES.FETCH_PENDING_TUTORS_ERROR });
     }
   }
 
@@ -325,7 +326,7 @@ class AdminController {
       if (!status || !["approved", "rejected"].includes(status)) {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "Invalid status only approved or rejected" });
+          .json({ message:MESSAGES.INVALID_TUTOR_STATUS });
         return;
       }
 
@@ -337,7 +338,7 @@ class AdminController {
         isActive
       );
       if (!verifyTutor) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: "Tutor not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message:MESSAGES.TUTOR_NOT_FOUND });
         return;
       }
       res
@@ -347,7 +348,7 @@ class AdminController {
       console.error("Error updating tutor verification:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "An unexpected error occurred." });
+        .json({ message:MESSAGES.UNEXPECTED_ERROR });
     }
   }
 
@@ -358,7 +359,7 @@ class AdminController {
       if (!req.admin) {
         res
           .status(HttpStatus.FORBIDDEN)
-          .json({ message: "Access denied Admins only" });
+          .json({ message:MESSAGES.ACCESS_DENIED});
         return;
       }
 
@@ -368,7 +369,7 @@ class AdminController {
       if (typeof isActive !== "boolean") {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ message: "Invalid 'isActive' value. Must be a boolean." });
+          .json({ message: MESSAGES.INVALID_IS_ACTIVE });
         return;
       }
 
@@ -378,7 +379,7 @@ class AdminController {
       );
 
       if (!updateStatus) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: "Tutor not found." });
+        res.status(HttpStatus.NOT_FOUND).json({ message:MESSAGES.TUTOR_NOT_FOUND });
         return;
       }
 
@@ -390,7 +391,7 @@ class AdminController {
       console.error("Error updating tutor status:", error);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "An unexpected error occurred." });
+        .json({ message:MESSAGES.UNEXPECTED_ERROR });
     }
   }
 }

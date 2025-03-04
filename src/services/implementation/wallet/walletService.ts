@@ -69,14 +69,19 @@ class WalletService implements IWalletService {
 
   
 
-  async getUserWalletDetails(userId: string): Promise<IUserWallet | null> {
-    return await this.userWalletRepository.getWalletByUserId(userId);
+  async getUserWalletDetails(userId: string,page:number,limit:number): Promise<{wallet:IUserWallet | null,totalTransactions:number}> {
+    return await this.userWalletRepository.getWalletByUserId(userId,page,limit);
+  }
+
+
+   async getUserWallet(userId: string): Promise<IUserWallet | null> {
+    return await this.userWalletRepository.getWallet(userId)
   }
 
 
 
   async creditUserWallet(userId: string, amount: number, description: string): Promise<IUserWallet> {
-    let userWallet = await this.userWalletRepository.getWalletByUserId(userId);
+    let userWallet = await this.userWalletRepository.getWallet(userId);
   
     
     if (!userWallet) {

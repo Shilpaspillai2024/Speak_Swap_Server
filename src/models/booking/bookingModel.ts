@@ -7,14 +7,16 @@ export interface IBooking extends Document{
     selectedSlot:{startTime:string,endTime:string};
     status:'pending' |'confirmed'|'in-progress' | 'completed'|'cancelled';
     sessionFee:number;
-    paymentStatus:'paid'| 'pending' | 'failed'|'completed';
+    paymentStatus:'paid'| 'pending' | 'failed'|'completed'|'refunded';
     failureReason?:string;
+    cancellationReason?:string;
     bookingDate:Date;
     paymentId?:string;
     orderId?: string;
     sessionStartTime?:Date;
     sessionEndTime?:Date;
     duration?:number;
+    cancelledAt?:Date;
     
 }
 
@@ -47,11 +49,14 @@ const bookingSchema=new Schema<IBooking>({
     },
   paymentStatus: { 
     type: String, 
-    enum: ['paid', 'pending', 'failed'], 
+    enum: ['paid', 'pending', 'failed','refunded'], 
     default: 'pending'
  },
 
  failureReason: {
+  type: String
+},
+cancellationReason: {
   type: String
 },
   bookingDate: { 
@@ -73,6 +78,9 @@ sessionEndTime:{
 },
 duration:{
   type:Number,
+},
+cancelledAt: {
+  type: Date
 }
 
 },{ timestamps: true });

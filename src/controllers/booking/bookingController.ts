@@ -332,6 +332,11 @@ class BookingController {
     try {
       const tutorId = req.user;
 
+
+      const page=parseInt(req.query.page as string) || 0;
+      const limit=parseInt(req.query.limit as string) || 5;
+
+
       console.log("tutorId", tutorId);
       if (!tutorId) {
         res
@@ -339,10 +344,21 @@ class BookingController {
           .json({ success: false, message: "Invalid or missing tutor ID" });
         return;
       }
-      const result = await this.bookingService.getTutorBookings(tutorId);
-      console.log("result of booings", result);
+      const {bookings,total} = await this.bookingService.getTutorBookings(tutorId,page,limit);
 
-      res.status(HttpStatus.OK).json({ success: true, result });
+
+      const totalPages=Math.ceil(total/limit)
+      console.log("result of booings", bookings);
+
+      res.status(HttpStatus.OK).json({ success: true, 
+        bookings,
+        meta:{
+          totalItems:total,
+          totalPages,
+          currentPage:page,
+          itemsPerPage:limit
+        }
+      });
     } catch (error) {
       console.error("Error fetching user bookings:", error);
       res
@@ -424,6 +440,46 @@ class BookingController {
     } catch (error) {
       console.error("Error fetching tutor dashboard stats:", error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Server Error" });
+    }
+  }
+
+
+
+  async cancelBookingUser(req: CustomRequest, res: Response): Promise<void> {
+    try {
+      const { bookingId } = req.params;
+      const userId = req.user;
+
+      const { cancellationReason } = req.body;
+
+console.log(bookingId,userId)
+
+console.log("cancencelReason",cancellationReason)
+      if (!userId) {
+        res.status(HttpStatus.FORBIDDEN).json({ message: "Unauthorized" });
+        return;
+      }
+
+      if (!cancellationReason) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          success: false,
+          message: "Cancellation reason is required"
+        });
+        return;
+      }
+
+      const result = await this.bookingService.cancelBookingUser(
+        bookingId,
+        userId,
+        cancellationReason
+      );
+      res
+        .status(HttpStatus.OK)
+        .json({ message: "Session cancelled successfully", result });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to cancel session";
+      res.status(HttpStatus.BAD_REQUEST).json({ message: errorMessage });
     }
   }
 }
