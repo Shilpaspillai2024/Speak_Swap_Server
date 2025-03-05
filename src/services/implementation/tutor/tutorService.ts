@@ -1,4 +1,4 @@
-import { ITutor ,IAvailability} from "../../../types/ITutor";
+import { ITutor, IAvailability } from "../../../types/ITutor";
 import ITutorRepository from "../../../repositories/interfaces/tutor/itutorRepository";
 import EmailUtils from "../../../utils/emailUtils";
 import PasswordUtils from "../../../utils/passwordUtils";
@@ -8,15 +8,19 @@ import cloudinary from "../../../config/cloudinaryConfig";
 import ITutorService from "../../interfaces/tutor/itutorService";
 import IWalletRepository from "../../../repositories/interfaces/wallet/iwalletRepository";
 
+
 dotenv.config();
 
-class TutorService implements ITutorService{
+class TutorService implements ITutorService {
   private tutorRepository: ITutorRepository;
-  private walletRepository:IWalletRepository;
+  private walletRepository: IWalletRepository;
 
-  constructor(tutorRepository: ITutorRepository,walletRepository:IWalletRepository) {
+  constructor(
+    tutorRepository: ITutorRepository,
+    walletRepository: IWalletRepository
+  ) {
     this.tutorRepository = tutorRepository;
-    this.walletRepository=walletRepository;
+    this.walletRepository = walletRepository;
   }
 
   //generate jwt
@@ -52,7 +56,8 @@ class TutorService implements ITutorService{
       throw new Error("email already Exists");
     }
 
-    const tutor = await this.tutorRepository.createTutor(tutorDetails);
+  //  const tutor = await this.tutorRepository.createTutor(tutorDetails);
+    const tutor = await this.tutorRepository.create(tutorDetails);
     const token = this.generateToken(tutor._id.toString());
 
     return { tutor, token };
@@ -69,7 +74,8 @@ class TutorService implements ITutorService{
 
     const tutorId = this.verifyToken(token);
 
-    const tutor = await this.tutorRepository.findTutorById(tutorId);
+    //const tutor = await this.tutorRepository.findTutorById(tutorId);
+    const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("Tutor is not found");
     }
@@ -90,7 +96,8 @@ class TutorService implements ITutorService{
   //verify otp
 
   async verifyOtp(tutorId: string, otp: string): Promise<string> {
-    const tutor = await this.tutorRepository.findTutorById(tutorId);
+   // const tutor = await this.tutorRepository.findTutorById(tutorId);
+    const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("Tutor not found");
     }
@@ -113,7 +120,8 @@ class TutorService implements ITutorService{
   //step 3
 
   async setPassword(tutorId: string, password: string): Promise<ITutor> {
-    const tutor = await this.tutorRepository.findTutorById(tutorId);
+   // const tutor = await this.tutorRepository.findTutorById(tutorId);
+   const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor || !tutor.isVerified) {
       console.error("User not found or not verified");
       throw new Error("User not found or not verified");
@@ -135,7 +143,8 @@ class TutorService implements ITutorService{
       certificates?: string[];
     }
   ): Promise<ITutor> {
-    const tutor = await this.tutorRepository.findTutorById(tutorId);
+  //  const tutor = await this.tutorRepository.findTutorById(tutorId);
+  const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("User Not found");
     }
@@ -154,6 +163,8 @@ class TutorService implements ITutorService{
       );
 
       details.profilePhoto = profilePhotoResult.secure_url;
+
+      
     }
 
     // Handle Introduction Video Upload
@@ -166,6 +177,8 @@ class TutorService implements ITutorService{
         unique_filename: true,
       });
       details.introductionVideo = videoResult.secure_url;
+
+     
     }
 
     // Handle Certificates Upload
@@ -182,6 +195,8 @@ class TutorService implements ITutorService{
 
         console.log(" pdf url :", certResult.secure_url);
         certificateUrls.push(certResult.secure_url);
+
+       
       }
       details.certificates = certificateUrls;
     }
@@ -300,93 +315,81 @@ class TutorService implements ITutorService{
     return tutor;
   }
 
+  // get tutor
 
-  // get tutor 
-
-  async getTutor(id:string):Promise<ITutor | null>{
-    return await this.tutorRepository.findTutorById(id)
+  async getTutor(id: string): Promise<ITutor | null> {
+   // return await this.tutorRepository.findTutorById(id);
+    return await this.tutorRepository.findById(id);
   }
 
-
-  async setAvailability(id:string,schedule:IAvailability[],timeZone:string):Promise<ITutor | null>{
-      const updateTutor=await this.tutorRepository.setAvailability(id,schedule,timeZone)
-
-      if(!updateTutor){
-        throw new Error("Tutor not found or availability update failed.");
-      }
-      return updateTutor
-  }
-
-
-  async deleteSlot(id: string, date: string, slotIndex: number): Promise<ITutor | null> {
-  
-
-    const updateTutor=await this.tutorRepository.deleteSlot(id,date,slotIndex)
-  
+  async setAvailability(
+    id: string,
+    schedule: IAvailability[],
+    timeZone: string
+  ): Promise<ITutor | null> {
+    const updateTutor = await this.tutorRepository.setAvailability(
+      id,
+      schedule,
+      timeZone
+    );
 
     if (!updateTutor) {
-      throw new Error('Failed to delete slot or tutor not found.');
+      throw new Error("Tutor not found or availability update failed.");
     }
     return updateTutor;
   }
 
+  async deleteSlot(
+    id: string,
+    date: string,
+    slotIndex: number
+  ): Promise<ITutor | null> {
+    const updateTutor = await this.tutorRepository.deleteSlot(
+      id,
+      date,
+      slotIndex
+    );
 
-  async getAvailability(id:string):Promise<IAvailability[] | null> {
-
-    return await this.tutorRepository.getAvailability(id)
+    if (!updateTutor) {
+      throw new Error("Failed to delete slot or tutor not found.");
+    }
+    return updateTutor;
   }
 
+  async getAvailability(id: string): Promise<IAvailability[] | null> {
+    return await this.tutorRepository.getAvailability(id);
+  }
 
+  async getTutorEarnings(
+    tutorId: string
+  ): Promise<{ date: string; amount: number }[]> {
+    const wallet = await this.walletRepository.getWalletByTutorId(tutorId);
 
-
-  async getTutorEarnings(tutorId: string): Promise<{ date: string; amount: number; }[]> {
-    const wallet=await this.walletRepository.getWalletByTutorId(tutorId)
-  
-  
-    if(!wallet){
+    if (!wallet) {
       return [];
     }
-  
-    // const earningsByDate: Record<string, number> = {};
-  
-      // wallet.transactions.forEach((txn) => {
-      //   if (txn.type === "credit") {
-      //     const dateKey = txn.date.toISOString().split("T")[0]; 
-      //     earningsByDate[dateKey] = (earningsByDate[dateKey] || 0) + txn.amount;
-      //   }
-      // });
-  
-      // return Object.entries(earningsByDate).map(([date, amount]) => ({ date, amount }));
-  
-      const earningsByDate: Record<string, { amount: number; type: string }> = {};
 
-      wallet.transactions.forEach((txn) => {
-        const dateKey = txn.date.toISOString().split("T")[0]; 
-        if (!earningsByDate[dateKey]) {
-          earningsByDate[dateKey] = { amount: 0, type: txn.type };
-        }
-    
-        if (txn.type === "credit") {
-          earningsByDate[dateKey].amount += txn.amount; 
-        } else if (txn.type === "debit") {
-          earningsByDate[dateKey].amount -= txn.amount; 
-        }
-      });
-    
-      return Object.entries(earningsByDate).map(([date, data]) => ({
-        date,
-        amount: data.amount,
-        type: data.type,
-      }));
+    const earningsByDate: Record<string, { amount: number; type: string }> = {};
 
-      
+    wallet.transactions.forEach((txn) => {
+      const dateKey = txn.date.toISOString().split("T")[0];
+      if (!earningsByDate[dateKey]) {
+        earningsByDate[dateKey] = { amount: 0, type: txn.type };
+      }
 
+      if (txn.type === "credit") {
+        earningsByDate[dateKey].amount += txn.amount;
+      } else if (txn.type === "debit") {
+        earningsByDate[dateKey].amount -= txn.amount;
+      }
+    });
 
-
+    return Object.entries(earningsByDate).map(([date, data]) => ({
+      date,
+      amount: data.amount,
+      type: data.type,
+    }));
   }
-  
-  
-
 }
 
 export default TutorService;

@@ -1,6 +1,6 @@
 import { User,IUser } from "../../../models/user/userModel";
 import IUserRepository from "../../interfaces/user/iuserRepository";
-
+import BaseRepository from "../base/baseRepository";
 interface IUserFilter {
     _id?: { $ne?: string } | string;
     isActive?: boolean;
@@ -8,22 +8,26 @@ interface IUserFilter {
    
   }
 
-class UserRepository implements IUserRepository{
+class UserRepository extends BaseRepository<IUser> implements IUserRepository{
 
 
-    async createUser(user: Partial<IUser>): Promise<IUser> {
-      const newUser=new User(user);
-      return await newUser.save()
+    constructor(){
+        super(User);
     }
+
+    // async createUser(user: Partial<IUser>): Promise<IUser> {
+    //   const newUser=new User(user);
+    //   return await newUser.save()
+    // }
 
     async findUserByEmail(email: string): Promise<IUser | null> {
        
         return await User.findOne({email})
     }
 
-    async findUserById(id: string): Promise<IUser | null> {
-        return await User.findById(id)
-    }
+    // async findUserById(id: string): Promise<IUser | null> {
+    //     return await User.findById(id)
+    // }
 
     async updateOnlineStatus(id: string, isOnline: boolean): Promise<void> {
         await User.findByIdAndUpdate(id,{
@@ -33,9 +37,9 @@ class UserRepository implements IUserRepository{
     }
 
 
-    async updateUser(id: string, update: Partial<IUser>): Promise<IUser | null> {
-        return await User.findByIdAndUpdate(id,update,{new:true})
-    }
+    // async updateUser(id: string, update: Partial<IUser>): Promise<IUser | null> {
+    //     return await User.findByIdAndUpdate(id,update,{new:true})
+    // }
 
    
     async getAllUsers(page: number=1, limit: number=6, loggedInUserId: string,searchQuery:string=""): Promise<IUser[]> {
@@ -61,10 +65,7 @@ class UserRepository implements IUserRepository{
         .exec();
     }
 
-    async deleteUser(id: string): Promise<IUser | null> {
-        return await User.findByIdAndDelete(id)
-    }
-
+   
 }
 
 

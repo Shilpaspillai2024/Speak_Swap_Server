@@ -8,6 +8,7 @@ import cloudinary from "../../../config/cloudinaryConfig";
 import ITutorRepository from "../../../repositories/interfaces/tutor/itutorRepository";
 import { ITutor } from "../../../types/ITutor";
 import { IUserService } from "../../interfaces/user/iuserService";
+import fs from'fs/promises';
 
 dotenv.config();
 
@@ -57,7 +58,9 @@ class UserService implements IUserService {
       throw new Error("email already Exists");
     }
 
-    const user = await this.userRepository.createUser(userDetails);
+   // const user = await this.userRepository.createUser(userDetails);
+
+    const user = await this.userRepository.create(userDetails);
     const token = this.generateToken(user._id.toString());
 
     return { user, token };
@@ -74,7 +77,8 @@ class UserService implements IUserService {
 
     const userId = this.verifyToken(token);
 
-    const user = await this.userRepository.findUserById(userId);
+   // const user = await this.userRepository.findUserById(userId);
+    const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -95,7 +99,8 @@ class UserService implements IUserService {
   //verify otp
 
   async verifyOtp(userId: string, otp: string): Promise<string> {
-    const user = await this.userRepository.findUserById(userId);
+    //const user = await this.userRepository.findUserById(userId);
+    const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -117,7 +122,8 @@ class UserService implements IUserService {
   }
 
   async setPassword(userId: string, password: string): Promise<IUser> {
-    const user = await this.userRepository.findUserById(userId);
+    // const user = await this.userRepository.findUserById(userId);
+    const user = await this.userRepository.findById(userId);
     if (!user || !user.isVerified) {
       console.error("User not found or not verified");
       throw new Error("User not found or not verified");
@@ -135,7 +141,8 @@ class UserService implements IUserService {
     userId: string,
     details: Partial<IUser>
   ): Promise<IUser> {
-    const user = await this.userRepository.findUserById(userId);
+   // const user = await this.userRepository.findUserById(userId);
+   const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error("User Not found");
     }
@@ -151,7 +158,8 @@ class UserService implements IUserService {
     userId: string,
     details: Partial<IUser>
   ): Promise<IUser> {
-    const user = await this.userRepository.findUserById(userId);
+   // const user = await this.userRepository.findUserById(userId);
+   const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -165,7 +173,8 @@ class UserService implements IUserService {
   //step 6 upload pictue
 
   async uploadProfilePicture(userId: string, filePath: string): Promise<IUser> {
-    const user = await this.userRepository.findUserById(userId);
+    //const user = await this.userRepository.findUserById(userId);
+    const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error("user not found");
     }
@@ -179,6 +188,12 @@ class UserService implements IUserService {
     user.profilePhoto = result.secure_url;
     user.isActive = true;
     await user.save();
+
+
+    await fs.unlink(filePath)
+    .catch(error => {
+      console.error('Error deleting local file:', error);
+    });
     return user;
   }
 
@@ -286,16 +301,16 @@ class UserService implements IUserService {
     return await this.userRepository.getAllUsers(page,limit,loggedInUserId,searchQuery)
   }
 
-  async deleteuser(id: string): Promise<IUser | null> {
-    return await this.userRepository.deleteUser(id);
-  }
+  
 
   async getUser(id: string): Promise<IUser | null> {
-    return await this.userRepository.findUserById(id);
+   // return await this.userRepository.findUserById(id);
+    return await this.userRepository.findById(id);
   }
 
   async getLoggedUser(id: string): Promise<IUser | null> {
-    return await this.userRepository.findUserById(id);
+   // return await this.userRepository.findUserById(id);
+    return await this.userRepository.findById(id);
   }
 
   async updateUser(
@@ -310,7 +325,8 @@ class UserService implements IUserService {
       throw new Error("No data provided for update");
     }
 
-    return await this.userRepository.updateUser(id, updateData);
+   // return await this.userRepository.updateUser(id, updateData);
+    return await this.userRepository.update(id, updateData);
   }
 
   // get All tutors for listing  user side
@@ -322,7 +338,8 @@ class UserService implements IUserService {
   // get each tutor for profile listing
 
   async tutorProfile(tutorId: string): Promise<ITutor | null> {
-    return await this.tutorRepository.findTutorById(tutorId);
+   // return await this.tutorRepository.findTutorById(tutorId);
+    return await this.tutorRepository.findById(tutorId);
   }
 
 

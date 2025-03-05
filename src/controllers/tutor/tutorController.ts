@@ -17,6 +17,9 @@ class TutorController {
       const { tutor, token } = await this.tutorService.tutorBasicDetails(
         req.body
       );
+
+      console.log("tutor",tutor)
+      console.log("token",token)
       res
         .status(HttpStatus.CREATED)
         .json({ message: "Tutor registered successfully", tutor, token });

@@ -5,8 +5,14 @@ import { ITutor } from "../../../types/ITutor";
 import { Tutor } from "../../../models/tutor/tutorModel";
 import { IBooking } from "../../../models/booking/bookingModel";
 import Booking from "../../../models/booking/bookingModel";
+import BaseRepository from "../base/baseRepository";
 
-class AdminRepository implements IAdminRepository {
+
+class AdminRepository extends BaseRepository<IAdmin>implements IAdminRepository {
+
+  constructor(){
+    super(Admin);
+  }
 
   async findByEmail(email: string): Promise<IAdmin | null> {
     const admin = await Admin.findOne({ email, role: "admin" });

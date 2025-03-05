@@ -1,28 +1,34 @@
 import { Tutor } from "../../../models/tutor/tutorModel";
 import { ITutor, IAvailability } from "../../../types/ITutor";
 import ITutorRepository from "../../interfaces/tutor/itutorRepository";
+import BaseRepository from "../base/baseRepository";
 
-
-class TutorRepository implements ITutorRepository {
-  async createTutor(tutor: Partial<ITutor>): Promise<ITutor> {
-    const newTutor = new Tutor(tutor);
-    return await newTutor.save();
+class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository {
+  
+  constructor(){
+    super(Tutor)
   }
+  
+  // async createTutor(tutor: Partial<ITutor>): Promise<ITutor> {
+  //   const newTutor = new Tutor(tutor);
+  //   return await newTutor.save();
+  // }
 
   async findTutorByEmail(email: string): Promise<ITutor | null> {
     return await Tutor.findOne({ email });
   }
 
-  async findTutorById(id: string): Promise<ITutor | null> {
-    return await Tutor.findById(id);
-  }
+  // async findTutorById(id: string): Promise<ITutor | null> {
+  //   return await Tutor.findById(id);
+  // }
 
-  async updateTutor(
-    id: string,
-    update: Partial<ITutor>
-  ): Promise<ITutor | null> {
-    return await Tutor.findByIdAndUpdate(id, update, { new: true });
-  }
+  // async updateTutor(
+  //   id: string,
+  //   update: Partial<ITutor>
+  // ): Promise<ITutor | null> {
+  //   return await Tutor.findByIdAndUpdate(id, update, { new: true });
+  // }
+  
 
   async setAvailability(
     id: string,

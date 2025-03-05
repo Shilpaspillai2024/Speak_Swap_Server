@@ -2,8 +2,6 @@ import { Router } from "express";
 import UserController from "../../controllers/user/userController";
 import UserService from "../../services/implementation/user/userService";
 import UserRepository from "../../repositories/implementation/user/userRepository";
-// import GeoController from "../../controllers/geo/geoController";
-// import GeoService from "../../services/implementation/geo/geoService";
 import upload from "../../middlewares/uploadMiddleware";
 import authMiddleware from "../../middlewares/authMiddleware";
 import TutorRepository from "../../repositories/implementation/tutor/tutorRepository";
@@ -22,8 +20,7 @@ const userRepository =new UserRepository();
 const tutorRepository=new TutorRepository();
 const userService=new UserService(userRepository,tutorRepository)
 const userController=new UserController(userService)
-// const geoService=new GeoService()
-// const geoController=new GeoController(geoService)
+
 
 
 const walletRepository = new WalletRepository();
@@ -32,10 +29,6 @@ const userWalletRepository=new UserWalletRepository();
 const walletService = new WalletService(walletRepository,userWalletRepository);
 const walletController = new WalletController(walletService);
 
-
-
-// router.get("/countries",(req,res)=>geoController.getCountries(req,res))
-// router.get("/languages",(req,res)=>geoController.getLanguages(req,res))
 
 
 router.post("/signup/basic_details",(req,res)=>userController.registerBasicDetails(req,res))

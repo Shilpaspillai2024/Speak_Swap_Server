@@ -28,7 +28,6 @@ export interface IUserService {
 
   getAllUsers(page:number,limit:number,loggedInUserId:string,searchQuery:string): Promise<IUser[]>;
 
-  deleteuser(id: string): Promise<IUser | null>;
 
   getUser(id: string): Promise<IUser | null>;
 

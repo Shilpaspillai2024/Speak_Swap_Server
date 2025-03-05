@@ -2,8 +2,10 @@ import { IAdmin } from "../../../models/admin/adminModel";
 import { IUser } from "../../../models/user/userModel";
 import { ITutor } from "../../../types/ITutor";
 import { IBooking } from "../../../models/booking/bookingModel";
+import IBaseRepository from "../base/ibaseRepository";
 
-interface IAdminRepository{
+
+interface IAdminRepository extends IBaseRepository<IAdmin>{
     findByEmail(email:string):Promise<IAdmin|null>
     getAllUser(page:number,limit:number):Promise<{users:IUser[],totalUsers:number}>
     updateUserStatus(userId:string,isActive:boolean):Promise<IUser | null>
