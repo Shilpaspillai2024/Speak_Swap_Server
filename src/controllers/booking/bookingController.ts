@@ -133,7 +133,7 @@ class BookingController {
           orderId: order.id,
         },
       });
-    } catch (error) {
+    } catch (error:unknown) {
       console.error("Error in createBooking:", error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,

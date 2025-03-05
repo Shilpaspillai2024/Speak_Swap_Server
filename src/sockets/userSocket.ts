@@ -43,7 +43,7 @@ io.on("connection", (socket:Socket) => {
       const room = chatId;
       io.to(room).emit("receiveMessage", { ...data, timestamp: new Date() });
   
-      // io.to(room).emit('receiveMessage',data)
+      
   
       callback({ success: true, message: "Message sent successfully." });
     });

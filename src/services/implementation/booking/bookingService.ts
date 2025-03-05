@@ -23,7 +23,7 @@ class BookingService implements IBookingService {
   async createBooking(bookingData: IBookingDTO): Promise<IBooking> {
     try {
       return await this.bookingRepository.createBooking(bookingData);
-    } catch (error) {
+    } catch (error:unknown) {
       throw new Error(" failed to create booking");
     }
   }

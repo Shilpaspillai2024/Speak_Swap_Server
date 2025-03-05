@@ -6,11 +6,47 @@ import { IBooking } from "../../../models/booking/bookingModel";
 import mongoose from "mongoose";
 
 class BookingRepository implements IBookingRepository {
+
   async createBooking(bookingData: IBookingDTO): Promise<IBooking> {
-    const booking = new Booking(bookingData);
-    await booking.save();
-    return booking;
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
+    try {
+      
+      const existingBooking = await Booking.findOne(
+        {
+          tutorId: bookingData.tutorId,
+          selectedDate: bookingData.selectedDate,
+          "selectedSlot.startTime": bookingData.selectedSlot.startTime,
+          "selectedSlot.endTime": bookingData.selectedSlot.endTime,
+          status: { $nin: ["cancelled", "payment_failed"] },
+        }
+      ).session(session);
+  
+      if (existingBooking) {
+        throw new Error("Session already booked!");
+      }
+  
+     
+      const booking = new Booking(bookingData);
+      await booking.save({ session });
+  
+    
+      await session.commitTransaction();
+      session.endSession();
+  
+      return booking;
+    } catch (error:unknown) {
+      await session.abortTransaction();
+      session.endSession();
+      if (error instanceof Error) {
+        throw new Error(error.message); 
+      } else {
+        throw new Error("An unexpected error occurred"); 
+      }
+    }
   }
+  
 
   async updateBookingOrderId(
     bookingId: string,

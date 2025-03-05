@@ -82,7 +82,7 @@ class WalletController {
 
 
 
-  // user wallet dettails
+  // user wallet details
 
 
 
