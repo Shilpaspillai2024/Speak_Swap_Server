@@ -5,9 +5,11 @@ interface IMessage extends Document{
     chatId:ObjectId;
     senderId:ObjectId;
     senderRole:"user"|"tutor";
-    message:string;
+    message?:string;
+    imageUrl?:string;
     timestamp:Date;
     isRead:boolean;
+
 }
 
 const messageSchema = new Schema<IMessage>(
@@ -30,7 +32,11 @@ const messageSchema = new Schema<IMessage>(
      
       message: {
         type: String,
-        required: true,
+        trim:true,
+      },
+      imageUrl:{
+        type:String,
+        trim:true
       },
       
       timestamp: {

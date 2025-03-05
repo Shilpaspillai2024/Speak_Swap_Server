@@ -9,21 +9,26 @@ class MessageRepository implements IMessageRepository {
     chatId: string,
     senderId: string,
     senderRole: "user" | "tutor",
-    message: string
+    message: string,
+    imageUrl?:string,
   ): Promise<IMessage> {
     try {
       const newMessage = new Message({
         chatId,
         senderId,
         senderRole,
-
         message,
+        imageUrl,
       });
 
       console.log("newMessage before save:", newMessage);
 
       const savedMessage = await newMessage.save();
       console.log("savedMessage after save:", savedMessage);
+
+      const lastMessageContent = imageUrl 
+        ? (message ? `${message} (Image)` : 'Image') 
+        : message;
 
       await Chat.findByIdAndUpdate(
         chatId,
@@ -32,7 +37,9 @@ class MessageRepository implements IMessageRepository {
             "unreadCount.$[elem].count": 1,
           },
           lastMessage: {
-            message: message,
+            
+           // message: message,
+           message:lastMessageContent,
             timestamp: new Date(),
           },
           lastActivity: new Date(),

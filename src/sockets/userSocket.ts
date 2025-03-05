@@ -8,6 +8,7 @@ interface MarkReadData {
   userId: string;
 }
 
+
 const usersOnline = new Map();
 
 
@@ -34,11 +35,11 @@ io.on("connection", (socket:Socket) => {
     //handling sending messages
   
     socket.on("sendMessage", (data, callback) => {
-      if (!data?.chatId || !data?.message) {
+      if (!data?.chatId || (!data?.message && !data?.imageUrl) ) {
         callback({ success: false, message: "Invalid message data." });
         return;
       }
-      const { chatId, message } = data;
+      const { chatId, message,imageUrl } = data;
   
       const room = chatId;
       io.to(room).emit("receiveMessage", { ...data, timestamp: new Date() });

@@ -5,7 +5,8 @@ interface IMessageService {
     chatId: string,
     senderId: string,
     senderRole: "user" | "tutor",
-    message: string
+    message: string,
+    imageUrl?: string
   ): Promise<IMessage>;
 
   getMessagesByChatId(chatId: string): Promise<IMessage[]>;
