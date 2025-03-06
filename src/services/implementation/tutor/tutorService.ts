@@ -56,7 +56,7 @@ class TutorService implements ITutorService {
       throw new Error("email already Exists");
     }
 
-  //  const tutor = await this.tutorRepository.createTutor(tutorDetails);
+ 
     const tutor = await this.tutorRepository.create(tutorDetails);
     const token = this.generateToken(tutor._id.toString());
 
@@ -74,7 +74,7 @@ class TutorService implements ITutorService {
 
     const tutorId = this.verifyToken(token);
 
-    //const tutor = await this.tutorRepository.findTutorById(tutorId);
+    
     const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("Tutor is not found");
@@ -96,7 +96,7 @@ class TutorService implements ITutorService {
   //verify otp
 
   async verifyOtp(tutorId: string, otp: string): Promise<string> {
-   // const tutor = await this.tutorRepository.findTutorById(tutorId);
+  
     const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("Tutor not found");
@@ -120,7 +120,7 @@ class TutorService implements ITutorService {
   //step 3
 
   async setPassword(tutorId: string, password: string): Promise<ITutor> {
-   // const tutor = await this.tutorRepository.findTutorById(tutorId);
+   
    const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor || !tutor.isVerified) {
       console.error("User not found or not verified");
@@ -143,7 +143,7 @@ class TutorService implements ITutorService {
       certificates?: string[];
     }
   ): Promise<ITutor> {
-  //  const tutor = await this.tutorRepository.findTutorById(tutorId);
+  
   const tutor = await this.tutorRepository.findById(tutorId);
     if (!tutor) {
       throw new Error("User Not found");
@@ -318,7 +318,7 @@ class TutorService implements ITutorService {
   // get tutor
 
   async getTutor(id: string): Promise<ITutor | null> {
-   // return await this.tutorRepository.findTutorById(id);
+  
     return await this.tutorRepository.findById(id);
   }
 

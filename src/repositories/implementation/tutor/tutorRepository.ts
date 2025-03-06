@@ -3,32 +3,17 @@ import { ITutor, IAvailability } from "../../../types/ITutor";
 import ITutorRepository from "../../interfaces/tutor/itutorRepository";
 import BaseRepository from "../base/baseRepository";
 
-class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository {
-  
-  constructor(){
-    super(Tutor)
+class TutorRepository
+  extends BaseRepository<ITutor>
+  implements ITutorRepository
+{
+  constructor() {
+    super(Tutor);
   }
-  
-  // async createTutor(tutor: Partial<ITutor>): Promise<ITutor> {
-  //   const newTutor = new Tutor(tutor);
-  //   return await newTutor.save();
-  // }
 
   async findTutorByEmail(email: string): Promise<ITutor | null> {
     return await Tutor.findOne({ email });
   }
-
-  // async findTutorById(id: string): Promise<ITutor | null> {
-  //   return await Tutor.findById(id);
-  // }
-
-  // async updateTutor(
-  //   id: string,
-  //   update: Partial<ITutor>
-  // ): Promise<ITutor | null> {
-  //   return await Tutor.findByIdAndUpdate(id, update, { new: true });
-  // }
-  
 
   async setAvailability(
     id: string,
@@ -54,10 +39,11 @@ class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository 
     }
 
     const availability = tutor.availability.find((a) => {
-
-      return new Date(a.date).toISOString().split("T")[0] === new Date(date).toISOString().split("T")[0];
+      return (
+        new Date(a.date).toISOString().split("T")[0] ===
+        new Date(date).toISOString().split("T")[0]
+      );
     });
-
 
     if (
       !availability ||
@@ -67,8 +53,8 @@ class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository 
       throw new Error("Invalid day or slot index.");
     }
 
-    availability.slots.splice(slotIndex, 1); 
-    tutor.availability = tutor.availability.filter((a) => a.slots.length > 0); 
+    availability.slots.splice(slotIndex, 1);
+    tutor.availability = tutor.availability.filter((a) => a.slots.length > 0);
 
     return tutor.save();
   }
@@ -81,16 +67,20 @@ class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository 
     return tutor.availability;
   }
 
-  
+  async searchTutors(
+    searchQuery: string,
+    page: number = 1,
+    limit: number = 9
+  ): Promise<{ tutors: ITutor[]; total: number }> {
+    const skip = (page - 1) * limit;
 
-  async searchTutors(searchQuery: string,page:number=1,limit:number=9): Promise<{tutors:ITutor[],total:number}> {
-    
-    const skip=(page-1)*limit;
-   
-    const query: { isActive: boolean; $or?: { [key: string]: { $regex: RegExp } }[] } = {
+    const query: {
+      isActive: boolean;
+      $or?: { [key: string]: { $regex: RegExp } }[];
+    } = {
       isActive: true,
     };
-  
+
     if (searchQuery) {
       const regex = new RegExp(searchQuery, "i");
       query.$or = [
@@ -100,15 +90,12 @@ class TutorRepository extends BaseRepository<ITutor>implements ITutorRepository 
       ];
     }
 
-
     const [tutors, total] = await Promise.all([
       Tutor.find(query).skip(skip).limit(limit),
-      Tutor.countDocuments(query)
+      Tutor.countDocuments(query),
     ]);
-    
+
     return { tutors, total };
   }
-
-  
 }
 export default TutorRepository;
