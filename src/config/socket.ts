@@ -7,7 +7,7 @@ const initializeSocket =(server:HttpServer)=>{
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Allow frontend origin
+    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
