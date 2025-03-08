@@ -34,7 +34,7 @@ Thumbs.db
 *.temp
 *.tmp
 
-src/uploads/
+
 
 # Docker Files (Only Built Images, Not Dockerfile)
 docker-compose.override.yml
