@@ -33,15 +33,20 @@ app.use(urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",  
-    credentials: true,  
+const allowedOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(",").map(origin => origin.trim()).filter(Boolean) 
+    : [];
+
+console.log("Allowed Origins:", allowedOrigins);
+
+app.use(cors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : "", 
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["set-cookie"],
-  })
-);
+}));
+
 
 connectdb();
 
