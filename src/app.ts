@@ -28,8 +28,8 @@ const server = http.createServer(app);
 
 const io=initializeSocket(server);
 
-app.use(json());
-app.use(urlencoded({ extended: true }));
+app.use(json({limit:"50mb"}));
+app.use(urlencoded({ extended: true,limit:"50mb"}));
 
 app.use(cookieParser());
 
